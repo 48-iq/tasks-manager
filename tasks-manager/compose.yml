@@ -1,0 +1,55 @@
+
+networks:
+  backend:
+services:
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    ports:
+      - 8080:8080
+    networks:
+      - backend
+
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    ports:
+      - 8888:8888
+    networks:
+      - backend
+
+  discovery-server:
+    build: ./discovery-server
+    container_name: discovery-server
+    ports:
+      - :8761
+    networks:
+      - backend
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - :8080
+    networks:
+      - backend
+
+  postgresdb:
+    image: postgres
+    restart: always
+    volumes:
+      - postgresdb-data:/var/lib/postgresql/data
+      - ./postgresdb/init.sql:/docker-entrypoint-initdb.d/init.sql  
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - 5432:5432
+    networks:
+      - backend
+
+volumes:
+  postgresdb-data:
+
+
+
