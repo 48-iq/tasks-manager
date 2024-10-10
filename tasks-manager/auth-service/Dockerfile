@@ -1,9 +1,9 @@
 FROM eclipse-temurin:21-jdk-jammy AS base
 WORKDIR /app
 COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
+COPY mvnw auth-service/pom.xml ./
 RUN ./mvnw dependency:resolve
-COPY src ./src
+COPY auth-service/src ./src
 
 FROM base AS build
 RUN ./mvnw package

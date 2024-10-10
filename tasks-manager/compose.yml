@@ -1,38 +1,76 @@
 
-networks:
-  backend:
 services:
+  orchestrator:
+
+    build:
+      context: .
+      dockerfile: ./orchestrator/Dockerfile
+    container_name: orchestrator
+    ports:
+      - :8080
+    networks:
+      backend:
+
+  user-service:
+    build:
+      context: .
+      dockerfile: ./user-service/Dockerfile
+    container_name: user-service
+    ports:
+      - :8080
+    networks:
+      backend:
+
+  uuid-service:
+    build:
+      context: .
+      dockerfile: ./uuid-service/Dockerfile
+    container_name: uuid-service
+    ports:
+      - :8080
+    networks:
+      backend:
+
+
   gateway:
-    build: ./gateway
+    build:
+      context: .
+      dockerfile: ./gateway/Dockerfile
     container_name: gateway
     ports:
       - 8080:8080
     networks:
-      - backend
+      backend:
 
   config-server:
-    build: ./config-server
+    build:
+      context: .
+      dockerfile: ./config-server/Dockerfile
     container_name: config-server
     ports:
       - 8888:8888
     networks:
-      - backend
+      backend:
 
   discovery-server:
-    build: ./discovery-server
+    build:
+      context: .
+      dockerfile: ./discovery-server/Dockerfile
     container_name: discovery-server
     ports:
       - :8761
     networks:
-      - backend
+      backend:
 
   auth-service:
-    build: ./auth-service
+    build:
+      context: .
+      dockerfile: ./auth-service/Dockerfile
     container_name: auth-service
     ports:
       - :8080
     networks:
-      - backend
+      backend:
 
   postgresdb:
     image: postgres
@@ -46,10 +84,35 @@ services:
     ports:
       - 5432:5432
     networks:
-      - backend
+      backend:
+
+  kafka:
+    image: bitnami/kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_KRAFT_CLUSTER_ID=abracadabra
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9091
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9090,EXTERNAL://kafka:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    volumes:
+      - kafka-data:/bitnami/kafka
+    networks:
+      backend:
+
 
 volumes:
   postgresdb-data:
+  kafka-data:
+
+networks:
+  backend:
+
 
 
 

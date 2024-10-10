@@ -1,4 +1,4 @@
-package dev.ivanov.tasks_manager.auth_service.dto;
+package dev.ivanov.tasks_manager.core.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NewUserRequest {
+public class UserDeleteEvent {
     private String id;
-    private String username;
 }

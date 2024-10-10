@@ -1,9 +1,9 @@
 FROM eclipse-temurin:21-jdk-jammy AS base
 WORKDIR /app
 COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
+COPY mvnw gateway/pom.xml ./
 RUN ./mvnw dependency:resolve
-COPY src ./src
+COPY gateway/src ./src
 
 FROM base AS build
 RUN ./mvnw package

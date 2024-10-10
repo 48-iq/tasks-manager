@@ -7,19 +7,29 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="config-server" />
-        <module name="uuid-service" />
+        <module name="orchestrator" />
         <module name="auth-service" />
         <module name="discovery-server" />
+        <module name="uuid-service" />
+        <module name="user-service" />
         <module name="gateway" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="core" target="21" />
+      <module name="events" target="21" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="auth-service" options="-parameters" />
       <module name="config-server" options="-parameters" />
+      <module name="core" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
+      <module name="events" options="-parameters" />
       <module name="gateway" options="-parameters" />
+      <module name="orchestrator" options="-parameters" />
+      <module name="user-service" options="-parameters" />
       <module name="uuid-service" options="-parameters" />
     </option>
   </component>

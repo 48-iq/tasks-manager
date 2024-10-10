@@ -39,12 +39,4 @@ public class JwtService {
                 .withClaim("role", user.getRole().name())
                 .sign(Algorithm.HMAC256(secret));
     }
-
-    public Map<String, Claim> verify(String jwt) {
-        var verifier = JWT.require(Algorithm.HMAC256(secret))
-                .withIssuer(issuer)
-                .withSubject(subject)
-                .build();
-        return verifier.verify(jwt).getClaims();
-    }
 }

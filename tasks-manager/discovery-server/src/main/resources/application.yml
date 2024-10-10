@@ -1,9 +1,11 @@
 spring:
   application:
-    name: discovery-server
+    name: discovery.server
 server:
   port: 8761
 eureka:
+  instance:
+    preferIpAddress: true
   client:
     register-with-eureka: false
     fetch-registry: false

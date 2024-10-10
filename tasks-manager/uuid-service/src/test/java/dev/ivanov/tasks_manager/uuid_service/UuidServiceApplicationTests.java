@@ -5,11 +5,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
-@SpringBootTest(properties = {"spring.cloud.config.enabled=false"})
+@SpringBootTest()
 class UuidServiceApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
-
 }

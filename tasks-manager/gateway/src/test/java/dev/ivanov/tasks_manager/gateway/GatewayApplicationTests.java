@@ -6,11 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
-@SpringBootTest(properties = {"spring.cloud.config.enabled=false"})
+@SpringBootTest()
 class GatewayApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
-
 }
