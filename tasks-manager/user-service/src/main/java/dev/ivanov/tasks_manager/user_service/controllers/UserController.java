@@ -1,11 +1,12 @@
 package dev.ivanov.tasks_manager.user_service.controllers;
 
-import dev.ivanov.tasks_manager.core.events.UserCreatedEvent;
-import dev.ivanov.tasks_manager.core.events.UserDeletedEvent;
+import dev.ivanov.tasks_manager.core.events.user.UserCredCrateEvent;
+import dev.ivanov.tasks_manager.core.events.user.UserDeletedEvent;
 import dev.ivanov.tasks_manager.user_service.dto.UserDto;
 import dev.ivanov.tasks_manager.user_service.dto.UserSignUpDto;
 import dev.ivanov.tasks_manager.user_service.dto.UserUpdateDto;
-import dev.ivanov.tasks_manager.user_service.producers.EventProducer;
+import dev.ivanov.tasks_manager.user_service.producers.UserCreatedProducer;
+import dev.ivanov.tasks_manager.user_service.producers.UserDeletedProducer;
 import dev.ivanov.tasks_manager.user_service.repositories.UserRepository;
 import dev.ivanov.tasks_manager.user_service.services.UserService;
 import dev.ivanov.tasks_manager.user_service.validators.UserSignUpRequestDtoValidator;
@@ -30,10 +31,10 @@ public class UserController {
     private UserSignUpRequestDtoValidator userSignUpRequestDtoValidator;
 
     @Autowired
-    private EventProducer<UserCreatedEvent> userCreatedProducer;
+    private UserCreatedProducer userCreatedProducer;
 
     @Autowired
-    private EventProducer<UserDeletedEvent> userDeletedProducer;
+    private UserDeletedProducer userDeletedProducer;
 
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUp(@RequestBody UserSignUpDto requestDto) {
@@ -45,7 +46,7 @@ public class UserController {
                     errors.getAllErrors().stream().map(e -> e.getDefaultMessage()).toList()
             );
         var savedUser = userService.createUser(requestDto);
-        var userCreatedEvent = UserCreatedEvent.builder()
+        var userCreatedEvent = UserCredCrateEvent.builder()
                 .id(savedUser.getId())
                 .username(savedUser.getUsername())
                 .password(requestDto.getPassword())

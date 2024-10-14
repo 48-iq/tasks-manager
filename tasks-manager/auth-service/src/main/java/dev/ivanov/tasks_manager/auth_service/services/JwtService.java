@@ -2,14 +2,11 @@ package dev.ivanov.tasks_manager.auth_service.services;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.Claim;
-import dev.ivanov.tasks_manager.auth_service.entities.User;
+import dev.ivanov.tasks_manager.auth_service.entities.UserCred;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.Map;
 
 @Service
 public class JwtService {
@@ -25,7 +22,7 @@ public class JwtService {
     @Value("${app.jwt.subject}")
     private String subject;
 
-    public String generate(User user) {
+    public String generate(UserCred user) {
         var expirationDate = ZonedDateTime.now()
                 .plusSeconds(expiration)
                 .toInstant();

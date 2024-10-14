@@ -1,12 +1,8 @@
-FROM eclipse-temurin:21-jdk-jammy AS base
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS build
 WORKDIR /app
-COPY .mvn/ .mvn
-COPY mvnw config-server/pom.xml ./
-RUN ./mvnw dependency:resolve
+COPY config-server/pom.xml ./
 COPY config-server/src ./src
-
-FROM base AS build
-RUN ./mvnw package
+RUN mvn package
 
 FROM eclipse-temurin:21-jre AS production
 COPY --from=build /app/target/config-server-*.jar /config-server.jar

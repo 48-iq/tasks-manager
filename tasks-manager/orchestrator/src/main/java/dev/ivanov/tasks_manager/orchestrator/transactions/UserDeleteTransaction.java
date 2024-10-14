@@ -1,9 +1,13 @@
 package dev.ivanov.tasks_manager.orchestrator.transactions;
 
-import dev.ivanov.tasks_manager.core.events.UserCreateEvent;
-import dev.ivanov.tasks_manager.core.events.UserCredDeleteEvent;
-import dev.ivanov.tasks_manager.core.events.UserCredDeletedEvent;
-import dev.ivanov.tasks_manager.core.events.UserDeletedEvent;
+import dev.ivanov.tasks_manager.core.events.user.UserCreateEvent;
+import dev.ivanov.tasks_manager.core.events.usercred.UserCredDeleteEvent;
+import dev.ivanov.tasks_manager.core.events.usercred.UserCredDeletedEvent;
+import dev.ivanov.tasks_manager.core.events.user.UserDeletedEvent;
+import dev.ivanov.tasks_manager.core.topics.Topics;
+import dev.ivanov.tasks_manager.orchestrator.entities.TransactionPart;
+import dev.ivanov.tasks_manager.orchestrator.event.TransactionPartNotFoundException;
+import dev.ivanov.tasks_manager.orchestrator.repositories.TransactionPartRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,39 +24,78 @@ public class UserDeleteTransaction {
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
-    @KafkaListener(topics = "user-deleted-events-topic")
+    @Autowired
+    private UuidService uuidService;
+
+    @Autowired
+    private TransactionPartRepository transactionPartRepository;
+
+    private static final String USER_DELETED_PART = "USER_DELETED_PART";
+
+
+
+    @KafkaListener(topics = Topics.USER_DELETED_EVENTS_TOPIC)
     public void startTransaction(UserDeletedEvent userDeletedEvent) {
+        var transactionId = uuidService.generate();
+        var id = uuidService.getFullId(transactionId, USER_DELETED_PART);
+        var transactionPart = TransactionPart.builder()
+                .id(id)
+                .event(userDeletedEvent)
+                .build();
+        transactionPartRepository.save(transactionPart);
+
         var userCredDeleteEvent = UserCredDeleteEvent.builder()
+                .transactionId(transactionId)
                 .id(userDeletedEvent.getId())
-                .name(userDeletedEvent.getName())
-                .surname(userDeletedEvent.getSurname())
-                .email(userDeletedEvent.getEmail())
-                .username(userDeletedEvent.getUsername())
                 .build();
         try {
-            var result = kafkaTemplate.send("user-cred-delete-events-topic", userCredDeleteEvent.getId(),
+            var result = kafkaTemplate.send(Topics.USER_CRED_DELETED_EVENTS_TOPIC,
+                    userCredDeleteEvent.getId(),
                     userCredDeleteEvent).get();
         } catch (InterruptedException|ExecutionException e) {
+            rollbackDeletedUser(transactionId);
             LOGGER.error(e.getMessage());
         }
     }
 
-    @KafkaListener(topics = "user-cred-delete-events-topic")
-    public void action1(UserCredDeletedEvent userCredDeletedEvent) {
-        var userCreateEvent = UserCreateEvent.builder()
-                .id(userCredDeletedEvent.getId())
-                .name(userCredDeletedEvent.getName())
-                .surname(userCredDeletedEvent.getSurname())
-                .email(userCredDeletedEvent.getEmail())
-                .username(userCredDeletedEvent.getUsername())
-                .build();
+    @KafkaListener(topics = Topics.USER_CRED_DELETED_EVENTS_TOPIC)
+    public void userCredDeleted(UserCredDeletedEvent userCredDeletedEvent) {
         if (userCredDeletedEvent.isError()) {
-            try {
-                var result = kafkaTemplate.send("user-deleted-events-topic", userCreateEvent.getId(),
-                        userCreateEvent).get();
-            } catch (ExecutionException|InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            rollbackDeletedUser(userCredDeletedEvent.getTransactionId());
+        } else {
+            commitTransaction(userCredDeletedEvent.getTransactionId());
         }
+    }
+
+    public void rollbackDeletedUser(String transactionId) {
+        var id = uuidService.getFullId(transactionId, USER_DELETED_PART);
+
+        var transactionPart = transactionPartRepository.findById(id)
+                .orElseThrow(() -> new TransactionPartNotFoundException(id));
+
+        var userDeletedEvent = (UserDeletedEvent) transactionPart.getEvent();
+
+        var userCreateEvent = UserCreateEvent.builder()
+                .transactionId(transactionId)
+                .id(userDeletedEvent.getId())
+                .name(userDeletedEvent.getName())
+                .surname(userDeletedEvent.getSurname())
+                .username(userDeletedEvent.getUsername())
+                .email(userDeletedEvent.getEmail())
+                .build();
+
+        transactionPartRepository.deleteById(id);
+        try {
+            var result = kafkaTemplate.send(Topics.USER_DELETED_EVENTS_TOPIC,
+                    userCreateEvent.getId(),
+                    userCreateEvent).get();
+        } catch (ExecutionException|InterruptedException e) {
+            LOGGER.error(e.getMessage());
+        }
+    }
+
+    public void commitTransaction(String transactionId) {
+        var userDeletedPartId = uuidService.getFullId(transactionId, USER_DELETED_PART);
+        transactionPartRepository.deleteById(userDeletedPartId);
     }
 }

@@ -1,12 +1,8 @@
-FROM eclipse-temurin:21-jdk-jammy AS base
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS build
 WORKDIR /app
-COPY .mvn/ .mvn
-COPY mvnw gateway/pom.xml ./
-RUN ./mvnw dependency:resolve
+COPY gateway/pom.xml ./
 COPY gateway/src ./src
-
-FROM base AS build
-RUN ./mvnw package
+RUN mvn package
 
 FROM eclipse-temurin:21-jre-jammy AS production
 COPY --from=build /app/target/gateway-*.jar /gateway.jar

@@ -1,8 +1,8 @@
 package dev.ivanov.tasks_manager.auth_service.validators;
 
 import dev.ivanov.tasks_manager.auth_service.entities.Role;
-import dev.ivanov.tasks_manager.core.events.UserCredCreateEvent;
-import dev.ivanov.tasks_manager.core.events.UserCredCreatedEvent;
+import dev.ivanov.tasks_manager.core.events.usercred.UserCredCreateEvent;
+import dev.ivanov.tasks_manager.core.events.usercred.UserCredCreatedEvent;
 import jakarta.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

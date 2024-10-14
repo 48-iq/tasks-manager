@@ -1,8 +1,7 @@
 package dev.ivanov.tasks_manager.user_service.consumers;
 
-import dev.ivanov.tasks_manager.core.events.UserDeleteEvent;
+import dev.ivanov.tasks_manager.core.events.user.UserDeleteEvent;
 import dev.ivanov.tasks_manager.user_service.services.UserService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;

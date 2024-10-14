@@ -1,6 +1,6 @@
 package dev.ivanov.tasks_manager.user_service.consumers;
 
-import dev.ivanov.tasks_manager.core.events.UserCreateEvent;
+import dev.ivanov.tasks_manager.core.events.user.UserCreateEvent;
 import dev.ivanov.tasks_manager.user_service.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaHandler;

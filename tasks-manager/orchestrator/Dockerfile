@@ -1,12 +1,13 @@
-FROM eclipse-temurin:21-jdk-jammy AS base
-WORKDIR /app
-COPY .mvn/ .mvn
-COPY mvnw orchestrator/pom.xml ./
-RUN ./mvnw dependency:resolve
-COPY orchestrator/src ./src
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS build
+WORKDIR ./core
+COPY ./core/pom.xml ./
+COPY ./core/src ./src
+RUN mvn install
 
-FROM base AS build
-RUN ./mvnw package
+WORKDIR /app
+COPY orchestrator/pom.xml ./
+COPY orchestrator/src ./src
+RUN mvn package
 
 FROM eclipse-temurin:21-jre-jammy AS production
 COPY --from=build /app/target/orchestrator-*.jar /orchestrator.jar
