@@ -1,6 +1,6 @@
 package dev.ivanov.tasks_manager.user_service.controllers;
 
-import dev.ivanov.tasks_manager.core.events.user.UserCredCrateEvent;
+import dev.ivanov.tasks_manager.core.events.user.UserCreatedEvent;
 import dev.ivanov.tasks_manager.core.events.user.UserDeletedEvent;
 import dev.ivanov.tasks_manager.user_service.dto.UserDto;
 import dev.ivanov.tasks_manager.user_service.dto.UserSignUpDto;
@@ -43,20 +43,9 @@ public class UserController {
 
         if (errors.hasErrors())
             return ResponseEntity.badRequest().body(
-                    errors.getAllErrors().stream().map(e -> e.getDefaultMessage()).toList()
-            );
+                    errors.getAllErrors().stream().map(e -> e.getDefaultMessage()).toList());
         var savedUser = userService.createUser(requestDto);
-        var userCreatedEvent = UserCredCrateEvent.builder()
-                .id(savedUser.getId())
-                .username(savedUser.getUsername())
-                .password(requestDto.getPassword())
-                .name(savedUser.getName())
-                .surname(savedUser.getSurname())
-                .email(savedUser.getEmail())
-                .role(requestDto.getRole())
-                .adminPassword(requestDto.getAdminPassword())
-                .build();
-        userCreatedProducer.send(userCreatedEvent);
+        userCreatedProducer.send(requestDto, savedUser);
         return ResponseEntity.ok().build();
     }
 
@@ -85,14 +74,7 @@ public class UserController {
         if (userOptional.isPresent()) {
             var user = userOptional.get();
             userService.deleteUser(userId);
-            var userDeletedEvent = UserDeletedEvent.builder()
-                    .id(user.getId())
-                    .username(user.getUsername())
-                    .name(user.getName())
-                    .surname(user.getSurname())
-                    .email(user.getEmail())
-                    .build();
-            userDeletedProducer.send(userDeletedEvent);
+            userDeletedProducer.send(user);
         }
         return ResponseEntity.ok().build();
     }

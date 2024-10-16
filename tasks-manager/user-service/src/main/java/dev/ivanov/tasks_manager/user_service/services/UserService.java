@@ -4,7 +4,7 @@ import dev.ivanov.tasks_manager.core.events.user.UserCreateEvent;
 import dev.ivanov.tasks_manager.user_service.dto.UserSignUpDto;
 import dev.ivanov.tasks_manager.user_service.dto.UserUpdateDto;
 import dev.ivanov.tasks_manager.user_service.entities.User;
-import dev.ivanov.tasks_manager.core.events.user.UserCredCrateEvent;
+import dev.ivanov.tasks_manager.core.events.user.UserCreatedEvent;
 import dev.ivanov.tasks_manager.user_service.exceptions.InternalServerException;
 import dev.ivanov.tasks_manager.user_service.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,7 +29,7 @@ public class UserService {
     private String gatewayHost;
 
     @Autowired
-    private KafkaTemplate<String, UserCredCrateEvent> kafkaTemplate;
+    private KafkaTemplate<String, UserCreatedEvent> kafkaTemplate;
 
     @Transactional
     public User createUser(UserSignUpDto signUpDto) {

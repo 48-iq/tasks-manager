@@ -13,6 +13,8 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 @Configuration
 public class RedisConfig {
 
+
+    //TODO fix redis properties for config
     @Bean
     public RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();

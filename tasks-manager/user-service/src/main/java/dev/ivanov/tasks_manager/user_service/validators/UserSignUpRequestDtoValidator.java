@@ -20,6 +20,7 @@ public class UserSignUpRequestDtoValidator implements Validator {
         return UserSignUpDto.class.equals(clazz);
     }
 
+    //TODO fix validate - add email unique constraint
     @Override
     public void validate(@Nonnull Object target, @Nonnull Errors errors) {
         var userSignUpRequestDto = (UserSignUpDto) target;

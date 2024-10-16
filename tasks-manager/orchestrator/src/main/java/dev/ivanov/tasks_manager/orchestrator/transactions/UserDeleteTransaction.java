@@ -49,7 +49,7 @@ public class UserDeleteTransaction {
                 .id(userDeletedEvent.getId())
                 .build();
         try {
-            var result = kafkaTemplate.send(Topics.USER_CRED_DELETED_EVENTS_TOPIC,
+            var result = kafkaTemplate.send(Topics.USER_CRED_DELETE_EVENTS_TOPIC,
                     userCredDeleteEvent.getId(),
                     userCredDeleteEvent).get();
         } catch (InterruptedException|ExecutionException e) {
@@ -86,7 +86,7 @@ public class UserDeleteTransaction {
 
         transactionPartRepository.deleteById(id);
         try {
-            var result = kafkaTemplate.send(Topics.USER_DELETED_EVENTS_TOPIC,
+            var result = kafkaTemplate.send(Topics.USER_CREATE_EVENTS_TOPIC,
                     userCreateEvent.getId(),
                     userCreateEvent).get();
         } catch (ExecutionException|InterruptedException e) {

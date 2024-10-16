@@ -1,6 +1,8 @@
 package dev.ivanov.tasks_manager.user_service.producers;
 
 import dev.ivanov.tasks_manager.core.events.user.UserDeletedEvent;
+import dev.ivanov.tasks_manager.core.topics.Topics;
+import dev.ivanov.tasks_manager.user_service.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +18,20 @@ public class UserDeletedProducer {
     @Autowired
     private KafkaTemplate<String, UserDeletedEvent> kafkaTemplate;
 
-    public void send(UserDeletedEvent userDeletedEvent) {
+    public void send(User user) {
+        var userDeletedEvent = UserDeletedEvent.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .surname(user.getSurname())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .build();
         try {
-            var result = kafkaTemplate.send("user-created-events-topic",
-                            userDeletedEvent.getId(), userDeletedEvent).get();
+            var result = kafkaTemplate.send(Topics.USER_DELETED_EVENTS_TOPIC,
+                    userDeletedEvent.getId(),
+                    userDeletedEvent).get();
         } catch (ExecutionException | InterruptedException e) {
-            LOGGER.error("user-deleted-events-topic message not sent");
+            LOGGER.error(e.getMessage());
         }
     }
 }

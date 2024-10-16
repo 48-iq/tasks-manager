@@ -1,6 +1,6 @@
 package dev.ivanov.tasks_manager.orchestrator.transactions;
 
-import dev.ivanov.tasks_manager.core.events.user.UserCredCrateEvent;
+import dev.ivanov.tasks_manager.core.events.user.UserCreatedEvent;
 import dev.ivanov.tasks_manager.core.events.usercred.UserCredCreateEvent;
 import dev.ivanov.tasks_manager.core.events.usercred.UserCredCreatedEvent;
 import dev.ivanov.tasks_manager.core.events.user.UserDeleteEvent;
@@ -34,7 +34,7 @@ public class UserCreateTransaction {
 
 
     @KafkaListener(topics = Topics.USER_CREATED_EVENTS_TOPIC)
-    public void startTransaction(UserCredCrateEvent event) {
+    public void startTransaction(UserCreatedEvent event) {
         var transactionId = uuidService.generate();
         var id = uuidService.getFullId(transactionId, USER_CREATED_PART);
 
@@ -53,7 +53,7 @@ public class UserCreateTransaction {
                 .adminPassword(event.getAdminPassword())
                 .build();
         try {
-            var result = kafkaTemplate.send(Topics.USER_CRED_UPDATE_EVENTS_TOPIC,
+            var result = kafkaTemplate.send(Topics.USER_CRED_CREATE_EVENTS_TOPIC,
                     event.getId(), userCredCreateEvent).get();
         } catch (ExecutionException | InterruptedException e) {
             rollbackCreatedUser(id);
@@ -77,7 +77,7 @@ public class UserCreateTransaction {
         var transactionPart = transactionPartRepository.findById(id)
                 .orElseThrow(() -> new TransactionPartNotFoundException(id));
 
-        var userCreatedEvent = (UserCredCrateEvent) transactionPart.getEvent();
+        var userCreatedEvent = (UserCreatedEvent) transactionPart.getEvent();
 
         var userDeleteEvent = UserDeleteEvent.builder()
                 .transactionId(transactionId)
@@ -87,7 +87,7 @@ public class UserCreateTransaction {
         transactionPartRepository.deleteById(id);
 
         try {
-            var result = kafkaTemplate.send(Topics.USER_CREATED_EVENTS_TOPIC,
+            var result = kafkaTemplate.send(Topics.USER_DELETE_EVENTS_TOPIC,
                     userDeleteEvent.getId(), userDeleteEvent).get();
 
         } catch (ExecutionException | InterruptedException e) {

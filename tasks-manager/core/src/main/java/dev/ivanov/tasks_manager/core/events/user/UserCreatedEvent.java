@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserCredCrateEvent {
+public class UserCreatedEvent {
     private String transactionId;
     private String id;
     private String name;

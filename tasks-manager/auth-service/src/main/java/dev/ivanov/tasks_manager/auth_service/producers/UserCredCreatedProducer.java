@@ -27,7 +27,7 @@ public class UserCredCreatedProducer {
                 .id(user.getId())
                 .build();
         try {
-            var result = kafkaTemplate.send(Topics.USER_CREATED_EVENTS_TOPIC,
+            var result = kafkaTemplate.send(Topics.USER_CRED_CREATED_EVENTS_TOPIC,
                     userCredCreatedEvent.getId(), userCredCreatedEvent).get();
         } catch (ExecutionException | InterruptedException e) {
             LOGGER.error(e.getMessage());
