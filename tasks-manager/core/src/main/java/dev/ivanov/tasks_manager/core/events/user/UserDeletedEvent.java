@@ -12,8 +12,5 @@ import lombok.NoArgsConstructor;
 public class UserDeletedEvent {
     private String transactionId;
     private String id;
-    private String username;
-    private String name;
-    private String surname;
-    private String email;
+    private boolean isError;
 }

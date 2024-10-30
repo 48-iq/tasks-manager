@@ -13,4 +13,3 @@ spring:
         initial-interval: 1100
         multiplier: 2
 
-      multiplier: 1.2

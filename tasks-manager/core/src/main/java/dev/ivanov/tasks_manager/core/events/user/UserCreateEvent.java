@@ -10,8 +10,4 @@ import lombok.*;
 public class UserCreateEvent {
     private String transactionId;
     private String id;
-    private String username;
-    private String name;
-    private String surname;
-    private String email;
 }

@@ -1,12 +1,15 @@
 package dev.ivanov.tasks_manager.user_service.services;
 
 import dev.ivanov.tasks_manager.core.events.user.UserCreateEvent;
-import dev.ivanov.tasks_manager.user_service.dto.UserSignUpDto;
+import dev.ivanov.tasks_manager.core.events.user.UserDeleteEvent;
+import dev.ivanov.tasks_manager.core.events.user.UserDeletedEvent;
 import dev.ivanov.tasks_manager.user_service.dto.UserUpdateDto;
-import dev.ivanov.tasks_manager.user_service.entities.User;
+import dev.ivanov.tasks_manager.user_service.entities.postgres.User;
 import dev.ivanov.tasks_manager.core.events.user.UserCreatedEvent;
 import dev.ivanov.tasks_manager.user_service.exceptions.InternalServerException;
-import dev.ivanov.tasks_manager.user_service.repositories.UserRepository;
+import dev.ivanov.tasks_manager.user_service.producers.UserCreatedProducer;
+import dev.ivanov.tasks_manager.user_service.producers.UserDeletedProducer;
+import dev.ivanov.tasks_manager.user_service.repositories.postgres.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,45 +22,42 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @Slf4j
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private UserRepository userRepository;
 
     @Value("${app.gateway.host}")
     private String gatewayHost;
 
     @Autowired
-    private KafkaTemplate<String, UserCreatedEvent> kafkaTemplate;
+    private UserCreatedProducer userCreatedProducer;
+
+    @Autowired
+    private UserDeletedProducer userDeletedProducer;
 
     @Transactional
-    public User createUser(UserSignUpDto signUpDto) {
-        var uuidResponseEntity = restTemplate.getForEntity(gatewayHost + "/api/uuid", String.class);
-        if (uuidResponseEntity.getStatusCode().isError())
-            throw new InternalServerException("uuid service is not available");
-        var uuid = uuidResponseEntity.getBody();
+    public User createUser(String id) {
         var user = User.builder()
-                .id(uuid)
-                .username(signUpDto.getUsername())
-                .name(signUpDto.getName())
-                .surname(signUpDto.getSurname())
-                .email(signUpDto.getEmail())
+                .id(id)
+                .name("")
+                .surname("")
+                .nickname("")
                 .build();
         return userRepository.save(user);
+
     }
 
-    @Transactional
-    public void createUser(UserCreateEvent userCreateEvent) {
-        var user = User.builder()
-                .id(userCreateEvent.getId())
-                .username(userCreateEvent.getUsername())
-                .email(userCreateEvent.getEmail())
-                .name(userCreateEvent.getName())
-                .surname(userCreateEvent.getSurname())
-                .build();
-        userRepository.save(user);
+    public void createUser(UserCreateEvent userCreatedEvent) {
+        try {
+            var user = createUser(userCreatedEvent.getId());
+            userCreatedProducer.sendSuccessful(userCreatedEvent.getId(),
+                    userCreatedEvent.getTransactionId());
+        } catch (Exception e) {
+            userCreatedProducer.sendError(userCreatedEvent.getId(), userCreatedEvent.getTransactionId());
+            throw e;
+        }
     }
+
 
 
     @Transactional
@@ -73,6 +73,17 @@ public class UserService {
     @Transactional
     public void deleteUser(String userId) {
         userRepository.deleteById(userId);
+    }
+
+    public void deleteUser(UserDeleteEvent userDeletedEvent) {
+        try {
+            deleteUser(userDeletedEvent.getId());
+            userDeletedProducer.sendSuccessful(userDeletedEvent.getId(), userDeletedEvent.getTransactionId());
+        } catch (Exception e) {
+            userDeletedProducer.sendError(userDeletedEvent.getId(), userDeletedEvent.getTransactionId());
+            throw e;
+        }
+
     }
 
 }

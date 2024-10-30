@@ -1,5 +1,24 @@
 
 services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: ./auth-service/Dockerfile
+    container_name: auth-service
+    ports:
+      - :8080
+    networks:
+      backend:
+    depends_on:
+      config-server:
+        condition: service_healthy
+      postgresdb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   orchestrator:
     build:
       context: .
@@ -95,23 +114,6 @@ services:
       - :8761
     networks:
       backend:
-
-  auth-service:
-    build:
-      context: .
-      dockerfile: ./auth-service/Dockerfile
-    container_name: auth-service
-    ports:
-      - :8080
-    networks:
-      backend:
-    depends_on:
-      config-server:
-        condition: service_healthy
-      postgresdb:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
 
   postgresdb:
     image: postgres

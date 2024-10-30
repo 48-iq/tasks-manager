@@ -1,6 +1,10 @@
-FROM maven:3.9.9-eclipse-temurin-21-alpine AS build
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS dependencies
 WORKDIR /app
 COPY gateway/pom.xml ./
+RUN mvn dependency:resolve
+
+
+FROM dependencies AS build
 COPY gateway/src ./src
 RUN mvn package
 

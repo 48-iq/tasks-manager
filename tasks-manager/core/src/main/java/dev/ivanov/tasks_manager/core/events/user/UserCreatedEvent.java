@@ -12,11 +12,5 @@ import lombok.NoArgsConstructor;
 public class UserCreatedEvent {
     private String transactionId;
     private String id;
-    private String name;
-    private String surname;
-    private String username;
-    private String password;
-    private String email;
-    private String role;
-    private String adminPassword;
+    private boolean isError;
 }

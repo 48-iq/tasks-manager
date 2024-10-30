@@ -2,8 +2,6 @@ package dev.ivanov.tasks_manager.user_service.producers;
 
 import dev.ivanov.tasks_manager.core.events.user.UserCreatedEvent;
 import dev.ivanov.tasks_manager.core.topics.Topics;
-import dev.ivanov.tasks_manager.user_service.dto.UserSignUpDto;
-import dev.ivanov.tasks_manager.user_service.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,21 +13,24 @@ import java.util.concurrent.ExecutionException;
 @Component
 public class UserCreatedProducer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserCreatedProducer.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(UserCreatedProducer.class);
 
     @Autowired
     private KafkaTemplate<String, UserCreatedEvent> kafkaTemplate;
 
-    public void send(UserSignUpDto userSignUpDto, User user) {
+    public void sendSuccessful(String id, String transactionId) {
+        send(id, transactionId, false);
+    }
+
+    public void sendError(String id, String transactionId) {
+        send(id, transactionId, true);
+    }
+
+    private void send(String id, String transactionId, boolean isError) {
         var userCreatedEvent = UserCreatedEvent.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .surname(user.getSurname())
-                .email(user.getEmail())
-                .username(userSignUpDto.getUsername())
-                .password(userSignUpDto.getPassword())
-                .role(userSignUpDto.getRole())
-                .adminPassword(userSignUpDto.getAdminPassword())
+                .id(id)
+                .transactionId(transactionId)
+                .isError(isError)
                 .build();
         try {
             var result = kafkaTemplate.send(Topics.USER_CREATED_EVENTS_TOPIC,

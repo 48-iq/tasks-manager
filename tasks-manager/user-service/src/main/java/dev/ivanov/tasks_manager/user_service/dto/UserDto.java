@@ -1,6 +1,6 @@
 package dev.ivanov.tasks_manager.user_service.dto;
 
-import dev.ivanov.tasks_manager.user_service.entities.User;
+import dev.ivanov.tasks_manager.user_service.entities.postgres.User;
 import lombok.*;
 
 @Data
@@ -10,7 +10,7 @@ import lombok.*;
 @ToString
 public class UserDto {
     private String id;
-    private String username;
+    private String nickname;
     private String name;
     private String surname;
     private String email;
@@ -18,7 +18,7 @@ public class UserDto {
     public static UserDto from(User user) {
         return UserDto.builder()
                 .id(user.getId())
-                .username(user.getUsername())
+                .nickname(user.getNickname())
                 .name(user.getName())
                 .surname(user.getSurname())
                 .email(user.getEmail())
