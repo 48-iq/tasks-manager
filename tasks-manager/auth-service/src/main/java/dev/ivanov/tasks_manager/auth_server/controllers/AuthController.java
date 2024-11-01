@@ -9,6 +9,7 @@ import dev.ivanov.tasks_manager.auth_server.security.JwtUtils;
 import dev.ivanov.tasks_manager.auth_server.services.AccountService;
 import dev.ivanov.tasks_manager.auth_server.services.AuthService;
 import dev.ivanov.tasks_manager.auth_server.validators.ChangePasswordDtoValidator;
+import dev.ivanov.tasks_manager.auth_server.validators.SignUpDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,9 @@ public class AuthController {
     private AccountService accountService;
 
     @Autowired
+    private SignUpDtoValidator signUpDtoValidator;
+
+    @Autowired
     private ChangePasswordDtoValidator changePasswordDtoValidator;
 
     @PostMapping("/sign-in")
@@ -44,9 +48,15 @@ public class AuthController {
 
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUp(@RequestBody SignUpDto signUpDto) {
-        var account = accountService.createAccount(signUpDto);
-        var tokenDto = jwtUtils.generateToken(account);
-        return ResponseEntity.ok(tokenDto);
+        var errors = new BeanPropertyBindingResult(signUpDto, "signUpDto");
+        signUpDtoValidator.validate(signUpDto, errors);
+        if (errors.hasErrors())
+            return ResponseEntity.badRequest().body(
+                    errors.getAllErrors().stream()
+                            .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                            .toList());
+        accountService.createAccount(signUpDto);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/change-password")

@@ -5,12 +5,17 @@ import dev.ivanov.tasks_manager.auth_server.dto.SignUpDto;
 import dev.ivanov.tasks_manager.auth_server.entities.postgres.Account;
 import dev.ivanov.tasks_manager.auth_server.entities.postgres.Role;
 import dev.ivanov.tasks_manager.auth_server.entities.redis.AccountCache;
+import dev.ivanov.tasks_manager.auth_server.entities.redis.Token;
+import dev.ivanov.tasks_manager.auth_server.entities.redis.UsernameCache;
 import dev.ivanov.tasks_manager.auth_server.exceptions.AccountNotFoundException;
 import dev.ivanov.tasks_manager.auth_server.exceptions.InternalServerException;
 import dev.ivanov.tasks_manager.auth_server.producers.AccountCreatedEventsProducer;
 import dev.ivanov.tasks_manager.auth_server.producers.AccountDeletedEventsProducer;
 import dev.ivanov.tasks_manager.auth_server.repositories.postgres.AccountRepository;
+import dev.ivanov.tasks_manager.auth_server.repositories.postgres.RoleRepository;
 import dev.ivanov.tasks_manager.auth_server.repositories.redis.AccountCacheRepository;
+import dev.ivanov.tasks_manager.auth_server.repositories.redis.BlacklistTokenRepository;
+import dev.ivanov.tasks_manager.auth_server.repositories.redis.UsernameCacheRepository;
 import dev.ivanov.tasks_manager.auth_server.security.JwtUtils;
 import jakarta.annotation.Nonnull;
 import jakarta.transaction.Transactional;
@@ -44,6 +49,15 @@ public class AccountService {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private UsernameCacheRepository usernameCacheRepository;
+
+    @Autowired
+    private BlacklistTokenRepository blacklistTokenRepository;
+
     private AccountCreatedEventsProducer accountCreatedEventsProducer;
     private AccountDeletedEventsProducer accountDeletedEventsProducer;
 
@@ -62,7 +76,7 @@ public class AccountService {
     private String gatewayHost;
 
     @Transactional
-    public Account createAccount(SignUpDto signUpDto) {
+    public void createAccount(SignUpDto signUpDto) {
         var encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
 
         var idEntity = restTemplate.getForEntity(gatewayHost + "/api/uuid", String.class);
@@ -75,10 +89,12 @@ public class AccountService {
                 .password(passwordEncoder.encode(signUpDto.getPassword()))
                 .roles(signUpDto.getRoles())
                 .build();
-        var savedAccountCache = accountCacheRepository.save(accountCache);
-        var account = Account.from(savedAccountCache);
-        accountCreatedEventsProducer.send(account);
-        return account;
+        accountCacheRepository.save(accountCache);
+        usernameCacheRepository.save(UsernameCache.builder()
+                .id(signUpDto.getUsername())
+                .accountId(id)
+                .build());
+        accountCreatedEventsProducer.send(id);
     }
 
     @Transactional
@@ -91,6 +107,10 @@ public class AccountService {
         var claims = jwtUtils.verify(changePasswordDto.getRefreshToken());
         var id = claims.get("id").asString();
         var accountOptional = accountRepository.findById(id);
+        blacklistTokenRepository.save(Token.builder()
+                .id(changePasswordDto.getRefreshToken())
+                .token(changePasswordDto.getRefreshToken())
+                .build());
         var account = accountOptional
                 .orElseThrow(() -> new AccountNotFoundException("account with id " + id + " not found"));
         var newPassword = passwordEncoder.encode(changePasswordDto.getNewPassword());
@@ -118,8 +138,13 @@ public class AccountService {
     public void commitCreation(String id) {
         var accountCache = accountCacheRepository.findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("account with id "+ id + " not found"));
+        accountCacheRepository.deleteById(id);
+        usernameCacheRepository.deleteById(accountCache.getUsername());
         var account = Account.from(accountCache);
-        accountRepository.save(account);
+        var savedAccount = accountRepository.save(account);
+        var roles = accountCache.getRoles().stream().map(r -> roleRepository.getReferenceById(r)).toList();
+        savedAccount.setRoles(roles);
+        accountRepository.save(savedAccount);
     }
 
 

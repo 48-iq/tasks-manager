@@ -9,6 +9,7 @@
         <module name="config-server" />
         <module name="orchestrator" />
         <module name="core" />
+        <module name="group-service" />
         <module name="auth-service" />
         <module name="discovery-server" />
         <module name="uuid-service" />
@@ -28,6 +29,7 @@
       <module name="discovery-server" options="-parameters" />
       <module name="events" options="-parameters" />
       <module name="gateway" options="-parameters" />
+      <module name="group-service" options="-parameters" />
       <module name="orchestrator" options="-parameters" />
       <module name="user-service" options="-parameters" />
       <module name="uuid-service" options="-parameters" />

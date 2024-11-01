@@ -26,9 +26,9 @@ public class AccountCreatedEventsProducer {
         this.accountService = accountService;
     }
 
-    public void send(Account account) {
+    public void send(String id) {
         var event = AccountCreatedEvent.builder()
-                .id(account.getId())
+                .id(id)
                 .build();
         try {
             var result = kafkaTemplate.send(Topics.ACCOUNT_CREATED_EVENTS_TOPIC, event.getId(), event).get();

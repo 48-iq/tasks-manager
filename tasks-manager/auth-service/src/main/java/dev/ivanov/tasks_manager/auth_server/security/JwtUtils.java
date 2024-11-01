@@ -46,6 +46,12 @@ public class JwtUtils {
                 .withClaim("id", account.getId())
                 .withClaim("username", account.getUsername())
                 .withClaim("roles", account.getRoles().stream().map(Role::getName).toList())
+                .withClaim("authorities", account.getRoles()
+                        .stream()
+                        .flatMap(r -> r.getAuthorities().stream())
+                        .distinct()
+                        .toList()
+                )
                 .withClaim("type", "access")
                 .withIssuedAt(ZonedDateTime.now().toInstant())
                 .withExpiresAt(ZonedDateTime.now().plusSeconds(expirationAccess).toInstant())
@@ -72,6 +78,20 @@ public class JwtUtils {
                 .withClaimPresence("id")
                 .withClaimPresence("username")
                 .withClaimPresence("roles")
+                .withClaim("type", "access")
+                .build();
+        return verifier.verify(jwt)
+                .getClaims();
+    }
+
+    public Map<String, Claim> verifyRefresh(String jwt) {
+        var verifier = JWT.require(Algorithm.HMAC256(secret))
+                .withIssuer(issuer)
+                .withSubject(subject)
+                .withClaimPresence("id")
+                .withClaimPresence("username")
+                .withClaimPresence("roles")
+                .withClaim("type", "refresh")
                 .build();
         return verifier.verify(jwt)
                 .getClaims();

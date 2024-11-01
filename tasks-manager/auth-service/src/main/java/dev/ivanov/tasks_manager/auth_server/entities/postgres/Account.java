@@ -5,6 +5,7 @@ import dev.ivanov.tasks_manager.auth_server.entities.redis.AccountCache;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,7 +31,6 @@ public class Account {
                 .id(accountCache.getId())
                 .username(accountCache.getUsername())
                 .password(accountCache.getPassword())
-                .roles(accountCache.getRoles().stream().map(Role::new).toList())
                 .build();
     }
 }

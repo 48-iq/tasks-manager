@@ -52,7 +52,7 @@ public class UserCreateTransaction {
                 var accountCreationCommitEvent = AccountCreationCommitEvent.builder()
                         .id(event.getId())
                         .transactionId(event.getTransactionId())
-                        .build();
+                        .build();   
                 var result = kafkaTemplate.send(Topics.ACCOUNT_CREATION_COMMIT_EVENTS_TOPIC,
                         accountCreationCommitEvent.getId(), accountCreationCommitEvent).get();
             }
