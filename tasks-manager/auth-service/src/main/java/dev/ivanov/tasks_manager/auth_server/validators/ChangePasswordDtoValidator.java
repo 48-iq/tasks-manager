@@ -16,14 +16,6 @@ import java.util.regex.Pattern;
 
 @Component
 public class ChangePasswordDtoValidator implements Validator {
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtUtils jwtUtils;
-
-    @Autowired
-    private AccountRepository accountRepository;
 
     @Autowired
     private RefreshJwtValidator refreshJwtValidator;
@@ -40,6 +32,11 @@ public class ChangePasswordDtoValidator implements Validator {
         var refresh = changePasswordDto.getRefreshToken();
 
         refreshJwtValidator.validate(refresh, errors);
+
+        if (newPassword == null)
+            errors.reject("new password", "new password is null");
+        else if (!newPassword.matches("^.{8,128}$"))
+            errors.reject("new password", "new password is incorrect");
     }
 
 

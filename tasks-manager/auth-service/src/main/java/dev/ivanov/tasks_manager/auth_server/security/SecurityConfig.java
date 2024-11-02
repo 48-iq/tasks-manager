@@ -1,5 +1,7 @@
 package dev.ivanov.tasks_manager.auth_server.security;
 
+import dev.ivanov.tasks_manager.auth_server.authorizers.AccountAuthorizer;
+import dev.ivanov.tasks_manager.core.authorization.ResourceAuthorizationManager;
 import dev.ivanov.tasks_manager.core.security.JwtAuthenticationProvider;
 import dev.ivanov.tasks_manager.core.security.BlackListJwtCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,15 +40,15 @@ public class SecurityConfig {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    private BlackListJwtCheckService blackListJwtCheckService;
+    private AccountAuthorizer accountAuthorizer;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/auth/change-password").authenticated()
-                        .requestMatchers("/api/auth/delete-account/**").authenticated()
+                        .requestMatchers("/api/auth/delete-account/**").access(resourceAuthorizationManager())
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -63,6 +67,13 @@ public class SecurityConfig {
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(provider);
+    }
+
+    @Bean
+    public ResourceAuthorizationManager resourceAuthorizationManager() {
+        ResourceAuthorizationManager resourceAuthorizationManager = new ResourceAuthorizationManager();
+        resourceAuthorizationManager.addAuthorizer(accountAuthorizer, "/delete-account/{accountId}", "DELETE");
+        return resourceAuthorizationManager;
     }
 
 }

@@ -2,10 +2,13 @@ package dev.ivanov.tasks_manager.auth_server.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import dev.ivanov.tasks_manager.auth_server.dto.TokenDto;
 import dev.ivanov.tasks_manager.auth_server.entities.postgres.Account;
 import dev.ivanov.tasks_manager.auth_server.entities.postgres.Role;
+import dev.ivanov.tasks_manager.core.security.BlackListJwtCheckService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +32,9 @@ public class JwtUtils {
 
     @Value("${app.jwt.expiration-refresh}")
     private Integer expirationRefresh;
+
+    @Autowired
+    private BlackListJwtCheckService blackListJwtCheckService;
 
     public TokenDto generateToken(Account account) {
         var access = generateAccess(account);
@@ -80,6 +86,8 @@ public class JwtUtils {
                 .withClaimPresence("roles")
                 .withClaim("type", "access")
                 .build();
+        if (blackListJwtCheckService.isOnBlacklist(jwt))
+            throw new JWTVerificationException("jwt in blacklist");
         return verifier.verify(jwt)
                 .getClaims();
     }
@@ -93,6 +101,8 @@ public class JwtUtils {
                 .withClaimPresence("roles")
                 .withClaim("type", "refresh")
                 .build();
+        if (blackListJwtCheckService.isOnBlacklist(jwt))
+            throw new JWTVerificationException("jwt in blacklist");
         return verifier.verify(jwt)
                 .getClaims();
     }

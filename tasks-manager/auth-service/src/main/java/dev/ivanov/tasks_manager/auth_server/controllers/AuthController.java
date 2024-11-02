@@ -5,7 +5,6 @@ import dev.ivanov.tasks_manager.auth_server.dto.SignInDto;
 import dev.ivanov.tasks_manager.auth_server.dto.SignUpDto;
 import dev.ivanov.tasks_manager.auth_server.exceptions.AccountNotFoundException;
 import dev.ivanov.tasks_manager.auth_server.exceptions.AuthorizationException;
-import dev.ivanov.tasks_manager.auth_server.security.JwtUtils;
 import dev.ivanov.tasks_manager.auth_server.services.AccountService;
 import dev.ivanov.tasks_manager.auth_server.services.AuthService;
 import dev.ivanov.tasks_manager.auth_server.validators.ChangePasswordDtoValidator;
@@ -20,9 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
-    @Autowired
-    private JwtUtils jwtUtils;
 
     @Autowired
     private AuthService authService;
@@ -53,19 +49,18 @@ public class AuthController {
         if (errors.hasErrors())
             return ResponseEntity.badRequest().body(
                     errors.getAllErrors().stream()
-                            .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                            .toList());
+                            .map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
         accountService.createAccount(signUpDto);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(ChangePasswordDto changePasswordDto) {
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
         var errors = new BeanPropertyBindingResult(changePasswordDto, "changePasswordDto");
         changePasswordDtoValidator.validate(changePasswordDto, errors);
         if (errors.hasErrors())
             return ResponseEntity.badRequest().body(errors.getAllErrors()
-                    .stream().map(DefaultMessageSourceResolvable::getDefaultMessage));
+                    .stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
         accountService.changePassword(changePasswordDto);
         return ResponseEntity.ok().build();
     }

@@ -1,4 +1,4 @@
-package dev.ivanov.tasks_manager.auth_server.services;
+package dev.ivanov.tasks_manager.auth_server.security;
 
 import dev.ivanov.tasks_manager.auth_server.repositories.redis.BlacklistTokenRepository;
 import dev.ivanov.tasks_manager.core.security.BlackListJwtCheckService;
