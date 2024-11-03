@@ -5,7 +5,7 @@ alter table if exists authorities
 insert into authorities(name) values
     ('BAN_USERS'),
     ('USE_SERVICES'),
-    ('GET_STATISTICS')
+    ('GET_STATISTICS');
 
 create table if not exists roles();
 
@@ -13,9 +13,11 @@ alter table if exists roles
     add column if not exists name text primary key not null;
 
 insert into roles(name) values
-	('ROLE_USER'), ('ROLE_ADMIN') on conflict do nothing
+	('ROLE_USER'), ('ROLE_ADMIN') on conflict do nothing;
 
-create table roles_authorities
+create table roles_authorities();
+
+alter table if exists roles_authorities
     add column if not exists role_name text not null references roles(name),
     add column if not exists authority_name text not null references authorities(name),
     drop constraint if exists roles_authorities_pkey,
@@ -39,7 +41,7 @@ alter table if exists accounts
 create table if not exists accounts_roles();
 
 alter table if exists accounts_roles
-    add column if not exists account_id not null text references accounts(id),
+    add column if not exists account_id text not null references accounts(id),
     add column if not exists role_name text not null references roles(name),
     drop constraint if exists accounts_roles_pkey,
     add primary key(account_id, role_name);

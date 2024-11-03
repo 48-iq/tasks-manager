@@ -47,13 +47,13 @@ public class UserService {
 
     }
 
-    public void createUser(UserCreateEvent userCreatedEvent) {
+    public void createUser(UserCreateEvent userCreateEvent) {
         try {
-            var user = createUser(userCreatedEvent.getId());
-            userCreatedProducer.sendSuccessful(userCreatedEvent.getId(),
-                    userCreatedEvent.getTransactionId());
+            var user = createUser(userCreateEvent.getId());
+            userCreatedProducer.sendSuccessful(userCreateEvent.getId(),
+                    userCreateEvent.getTransactionId());
         } catch (Exception e) {
-            userCreatedProducer.sendError(userCreatedEvent.getId(), userCreatedEvent.getTransactionId());
+            userCreatedProducer.sendError(userCreateEvent.getId(), userCreateEvent.getTransactionId());
             throw e;
         }
     }

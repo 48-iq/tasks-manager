@@ -6,11 +6,13 @@ import dev.ivanov.tasks_manager.core.events.auth.AccountCreationRollbackEvent;
 import dev.ivanov.tasks_manager.core.events.auth.AccountDeletionCommitEvent;
 import dev.ivanov.tasks_manager.core.events.auth.AccountDeletionRollbackEvent;
 import dev.ivanov.tasks_manager.core.topics.Topics;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class AccountEventsConsumer {
 
     @Autowired
@@ -18,6 +20,7 @@ public class AccountEventsConsumer {
 
     @KafkaListener(topics = Topics.ACCOUNT_CREATION_COMMIT_EVENTS_TOPIC)
     public void handleAccountCreationCommitEvent(AccountCreationCommitEvent event) {
+        log.info("event was handled {}", event);
         accountService.commitCreation(event.getId());
     }
 
@@ -33,6 +36,6 @@ public class AccountEventsConsumer {
 
     @KafkaListener(topics = Topics.ACCOUNT_DELETION_ROLLBACK_EVENTS_TOPIC)
     public void handleAccountDeletionRollbackEvent(AccountDeletionRollbackEvent event) {
-        accountService.commitDeletion(event.getId());
+        accountService.rollbackDeletion(event.getId());
     }
 }

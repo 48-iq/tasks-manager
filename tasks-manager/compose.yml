@@ -125,7 +125,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1234
     ports:
-      - 5432:5432
+      - :5432
     networks:
       backend:
     healthcheck:
