@@ -47,7 +47,7 @@ public class UserDeleteTransaction {
     public void handleUserDeletionResult(UserDeletedEvent event) {
         try {
             //handle successful user deletion
-            if (event.isError()) {
+            if (!event.isError()) {
                 var accountDeletionCommitEvent = AccountDeletionCommitEvent.builder()
                         .transactionId(event.getTransactionId())
                         .id(event.getId())

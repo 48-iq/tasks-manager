@@ -6,8 +6,10 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import dev.ivanov.tasks_manager.auth_server.dto.TokenDto;
 import dev.ivanov.tasks_manager.auth_server.entities.postgres.Account;
+import dev.ivanov.tasks_manager.auth_server.entities.postgres.Authority;
 import dev.ivanov.tasks_manager.auth_server.entities.postgres.Role;
 import dev.ivanov.tasks_manager.core.security.BlackListJwtCheckService;
+import dev.ivanov.tasks_manager.core.security.exceptions.BlacklistJwtAuthorizationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -56,6 +58,7 @@ public class JwtUtils {
                         .stream()
                         .flatMap(r -> r.getAuthorities().stream())
                         .distinct()
+                        .map(Authority::getName)
                         .toList()
                 )
                 .withClaim("type", "access")
@@ -71,6 +74,13 @@ public class JwtUtils {
                 .withClaim("id", account.getId())
                 .withClaim("username", account.getUsername())
                 .withClaim("roles", account.getRoles().stream().map(Role::getName).toList())
+                .withClaim("authorities", account.getRoles()
+                        .stream()
+                        .flatMap(r -> r.getAuthorities().stream())
+                        .distinct()
+                        .map(Authority::getName)
+                        .toList()
+                )
                 .withClaim("type", "refresh")
                 .withIssuedAt(ZonedDateTime.now().toInstant())
                 .withExpiresAt(ZonedDateTime.now().plusSeconds(expirationRefresh).toInstant())
@@ -87,7 +97,7 @@ public class JwtUtils {
                 .withClaim("type", "access")
                 .build();
         if (blackListJwtCheckService.isOnBlacklist(jwt))
-            throw new JWTVerificationException("jwt in blacklist");
+            throw new BlacklistJwtAuthorizationException("jwt in blacklist");
         return verifier.verify(jwt)
                 .getClaims();
     }

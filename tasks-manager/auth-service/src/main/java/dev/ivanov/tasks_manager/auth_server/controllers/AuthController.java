@@ -12,6 +12,7 @@ import dev.ivanov.tasks_manager.auth_server.validators.SignUpDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +38,8 @@ public class AuthController {
         try {
             var tokenDto = authService.signIn(signInDto);
             return ResponseEntity.ok(tokenDto);
-        } catch (AuthorizationException | UsernameNotFoundException | AccountNotFoundException e) {
-            return ResponseEntity.badRequest().body("authorization error");
+        } catch (AuthorizationException | AuthenticationException | AccountNotFoundException e) {
+            return ResponseEntity.badRequest().body("authentication error");
         }
     }
 
@@ -54,14 +55,20 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+    @PutMapping("/change-password/{accountId}")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDto changePasswordDto,
+                                            @PathVariable String accountId) {
         var errors = new BeanPropertyBindingResult(changePasswordDto, "changePasswordDto");
         changePasswordDtoValidator.validate(changePasswordDto, errors);
         if (errors.hasErrors())
             return ResponseEntity.badRequest().body(errors.getAllErrors()
                     .stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
-        accountService.changePassword(changePasswordDto);
+        try {
+
+            accountService.changePassword(accountId, changePasswordDto);
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
         return ResponseEntity.ok().build();
     }
 

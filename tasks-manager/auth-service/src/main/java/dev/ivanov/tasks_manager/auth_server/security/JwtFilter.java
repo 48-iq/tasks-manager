@@ -1,5 +1,6 @@
 package dev.ivanov.tasks_manager.auth_server.security;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import dev.ivanov.tasks_manager.auth_server.exceptions.AuthorizationException;
 import dev.ivanov.tasks_manager.auth_server.services.AuthService;
 import dev.ivanov.tasks_manager.core.security.JwtAuthenticationToken;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -52,8 +54,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response);
-        } catch (AuthorizationException | UsernameNotFoundException | BlacklistJwtAuthorizationException e) {
-            response.getWriter().write("authorization error");
+        } catch (AuthorizationException | JWTVerificationException | AuthenticationException | BlacklistJwtAuthorizationException e) {
+            response.getWriter().write("authentication error");
             response.setStatus(HttpStatus.BAD_REQUEST.value());
         }
     }

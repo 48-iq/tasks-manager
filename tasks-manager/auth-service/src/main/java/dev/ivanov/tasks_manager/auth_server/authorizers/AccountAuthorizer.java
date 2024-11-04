@@ -19,7 +19,7 @@ public class AccountAuthorizer implements Authorizer {
     public boolean authorize(Authentication authentication,
                              HttpServletRequest request,
                              Map<String, String> variables) {
-        var accountId = variables.get("id");
+        var accountId = variables.get("accountId");
         if (accountId == null) {
             LOGGER.error("missing id param");
             return false;

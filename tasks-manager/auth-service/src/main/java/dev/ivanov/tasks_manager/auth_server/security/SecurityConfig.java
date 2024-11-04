@@ -47,7 +47,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/auth/change-password").authenticated()
+                        .requestMatchers("/api/auth/change-password").access(resourceAuthorizationManager())
                         .requestMatchers("/api/auth/delete-account/**").access(resourceAuthorizationManager())
                         .anyRequest().permitAll()
                 )
@@ -73,6 +73,7 @@ public class SecurityConfig {
     public ResourceAuthorizationManager resourceAuthorizationManager() {
         ResourceAuthorizationManager resourceAuthorizationManager = new ResourceAuthorizationManager();
         resourceAuthorizationManager.addAuthorizer(accountAuthorizer, "/delete-account/{accountId}", "DELETE");
+        resourceAuthorizationManager.addAuthorizer(accountAuthorizer, "/change-password/{accountId}", "PUT");
         return resourceAuthorizationManager;
     }
 

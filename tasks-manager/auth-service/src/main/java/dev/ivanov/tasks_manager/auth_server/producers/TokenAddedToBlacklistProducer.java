@@ -21,9 +21,7 @@ public class TokenAddedToBlacklistProducer {
     @Autowired
     private KafkaTemplate<String, TokenAddedToBlacklistEvent> kafkaTemplate;
 
-    public void send(String token) {
-        var claims = jwtUtils.verify(token);
-        var id = claims.get("id").asString();
+    public void send(String id, String token) {
         var event = TokenAddedToBlacklistEvent.builder()
                 .id(id)
                 .token(token)

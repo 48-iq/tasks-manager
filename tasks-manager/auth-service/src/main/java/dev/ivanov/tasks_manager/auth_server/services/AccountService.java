@@ -32,6 +32,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+
 @Service
 public class AccountService {
 
@@ -109,10 +111,10 @@ public class AccountService {
     }
 
     @Transactional
-    public void changePassword(ChangePasswordDto changePasswordDto) {
-        var claims = jwtUtils.verify(changePasswordDto.getRefreshToken());
-        var id = claims.get("id").asString();
-        var accountOptional = accountRepository.findById(id);
+    public void changePassword(String id, ChangePasswordDto changePasswordDto) {
+
+        var account = accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException("account with id " + id + " not found"));
 
         blacklistTokenRepository.save(Token.builder()
                 .id(changePasswordDto.getRefreshToken())
@@ -124,10 +126,7 @@ public class AccountService {
                 .id(accessToken)
                 .token(accessToken)
                 .build());
-
-        var account = accountOptional
-                .orElseThrow(() -> new AccountNotFoundException("account with id " + id + " not found"));
-        tokenAddedToBlacklistProducer.send(accessToken);
+        tokenAddedToBlacklistProducer.send(id, accessToken);
         var newPassword = passwordEncoder.encode(changePasswordDto.getNewPassword());
         account.setPassword(newPassword);
         accountRepository.save(account);
@@ -157,7 +156,12 @@ public class AccountService {
         usernameCacheRepository.deleteById(accountCache.getUsername());
         var account = Account.from(accountCache);
         var savedAccount = accountRepository.save(account);
-        var roles = accountCache.getRoles().stream().map(r -> roleRepository.getReferenceById(r)).toList();
+        var cacheRoles = accountCache.getRoles();
+        var roles = new ArrayList<Role>();
+        for (var cacheRole: cacheRoles) {
+            var roleReference = roleRepository.getReferenceById(cacheRole);
+            roles.add(roleReference);
+        }
         savedAccount.setRoles(roles);
         accountRepository.save(savedAccount);
     }
