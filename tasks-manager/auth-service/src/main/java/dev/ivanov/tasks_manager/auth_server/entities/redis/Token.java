@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
 
 @Data
 @NoArgsConstructor
@@ -16,4 +17,6 @@ public class Token {
     @Id
     private String id;
     private String token;
+    @TimeToLive
+    private Long expiration;
 }

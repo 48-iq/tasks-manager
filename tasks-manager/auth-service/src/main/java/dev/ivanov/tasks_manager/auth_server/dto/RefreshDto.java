@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChangePasswordDto {
-    private String newPassword;
+public class RefreshDto {
     private String refresh;
 }

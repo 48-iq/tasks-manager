@@ -24,15 +24,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
-
-    @Value("${app.jwt.issuer}")
-    private String issuer;
-
-    @Value("${app.jwt.subject}")
-    private String subject;
-
     @Autowired
     private JwtFilter jwtFilter;
 
@@ -74,6 +65,7 @@ public class SecurityConfig {
         ResourceAuthorizationManager resourceAuthorizationManager = new ResourceAuthorizationManager();
         resourceAuthorizationManager.addAuthorizer(accountAuthorizer, "/delete-account/{accountId}", "DELETE");
         resourceAuthorizationManager.addAuthorizer(accountAuthorizer, "/change-password/{accountId}", "PUT");
+        resourceAuthorizationManager.addAuthorizer(accountAuthorizer, "/refresh/{accountId}", "POST");
         return resourceAuthorizationManager;
     }
 

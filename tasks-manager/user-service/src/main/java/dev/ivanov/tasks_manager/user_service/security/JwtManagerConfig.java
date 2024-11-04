@@ -20,7 +20,7 @@ public class JwtManagerConfig {
     @Value("${app.jwt.subject}")
     private String subject;
 
-    @Value("${app.jwt.secret}")
+    @Value("${app.jwt.secret-access}")
     private String secret;
 
     @Bean

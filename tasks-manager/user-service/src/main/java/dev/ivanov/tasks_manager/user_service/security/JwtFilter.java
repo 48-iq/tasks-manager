@@ -24,14 +24,6 @@ import java.util.Map;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-    @Value("${app.jwt.secret}")
-    private String secret;
-
-    @Value("${app.jwt.issuer}")
-    private String issuer;
-
-    @Value("${app.jwt.subject}")
-    private String subject;
 
     @Autowired
     private AuthenticationManager authenticationManager;

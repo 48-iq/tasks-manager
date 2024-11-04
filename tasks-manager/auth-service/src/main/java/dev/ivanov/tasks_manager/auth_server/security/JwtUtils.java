@@ -20,8 +20,12 @@ import java.util.Map;
 @Component
 public class JwtUtils {
 
-    @Value("${app.jwt.secret}")
-    private String secret;
+    @Value("${app.jwt.secret-refresh}")
+    private String refreshSecret;
+
+    @Value("${app.jwt.secret-access}")
+    private String accessSecret;
+
 
     @Value("${app.jwt.issuer}")
     private String issuer;
@@ -47,7 +51,7 @@ public class JwtUtils {
                 .build();
     }
 
-    private String generateAccess(Account account) {
+    public String generateAccess(Account account) {
         return JWT.create()
                 .withIssuer(issuer)
                 .withSubject(subject)
@@ -64,10 +68,10 @@ public class JwtUtils {
                 .withClaim("type", "access")
                 .withIssuedAt(ZonedDateTime.now().toInstant())
                 .withExpiresAt(ZonedDateTime.now().plusSeconds(expirationAccess).toInstant())
-                .sign(Algorithm.HMAC256(secret));
+                .sign(Algorithm.HMAC256(accessSecret));
     }
 
-    private String generateRefresh(Account account) {
+    public String generateRefresh(Account account) {
         return JWT.create()
                 .withIssuer(issuer)
                 .withSubject(subject)
@@ -84,11 +88,11 @@ public class JwtUtils {
                 .withClaim("type", "refresh")
                 .withIssuedAt(ZonedDateTime.now().toInstant())
                 .withExpiresAt(ZonedDateTime.now().plusSeconds(expirationRefresh).toInstant())
-                .sign(Algorithm.HMAC256(secret));
+                .sign(Algorithm.HMAC256(refreshSecret));
     }
 
-    public Map<String, Claim> verify(String jwt) {
-        var verifier = JWT.require(Algorithm.HMAC256(secret))
+    public Map<String, Claim> verifyAccess(String jwt) {
+        var verifier = JWT.require(Algorithm.HMAC256(accessSecret))
                 .withIssuer(issuer)
                 .withSubject(subject)
                 .withClaimPresence("id")
@@ -103,7 +107,7 @@ public class JwtUtils {
     }
 
     public Map<String, Claim> verifyRefresh(String jwt) {
-        var verifier = JWT.require(Algorithm.HMAC256(secret))
+        var verifier = JWT.require(Algorithm.HMAC256(refreshSecret))
                 .withIssuer(issuer)
                 .withSubject(subject)
                 .withClaimPresence("id")

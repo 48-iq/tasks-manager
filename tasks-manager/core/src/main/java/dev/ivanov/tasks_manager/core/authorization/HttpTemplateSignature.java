@@ -16,7 +16,7 @@ public class HttpTemplateSignature {
     }
 
     public boolean matches(String path, String method) {
-        return antPathMatcher.match(template, path) &&
-                methods.stream().anyMatch(m -> m.equals(method));
+        return antPathMatcher.match(template, path) &&  (methods.isEmpty() ||
+                methods.stream().anyMatch(m -> m.equals(method)));
     }
 }

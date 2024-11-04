@@ -2,7 +2,6 @@ package dev.ivanov.tasks_manager.auth_server.security;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import dev.ivanov.tasks_manager.auth_server.exceptions.AuthorizationException;
-import dev.ivanov.tasks_manager.auth_server.services.AuthService;
 import dev.ivanov.tasks_manager.core.security.JwtAuthenticationToken;
 import dev.ivanov.tasks_manager.core.security.exceptions.BlacklistJwtAuthorizationException;
 import jakarta.annotation.Nonnull;
@@ -12,10 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -39,7 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     throw new AuthorizationException();
                 var jwt = authorizationHeader.substring(7);
                 var token = new JwtAuthenticationToken();
-                var claims = jwtUtils.verify(jwt);
+                var claims = jwtUtils.verifyAccess(jwt);
                 var id = claims.get("id").asString();
                 var username = claims.get("username").asString();
                 var roles = claims.get("roles").asList(String.class);

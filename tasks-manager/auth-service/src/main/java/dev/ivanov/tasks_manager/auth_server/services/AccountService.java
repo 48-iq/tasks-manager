@@ -19,14 +19,12 @@ import dev.ivanov.tasks_manager.auth_server.repositories.redis.BlacklistTokenRep
 import dev.ivanov.tasks_manager.auth_server.repositories.redis.UsernameCacheRepository;
 import dev.ivanov.tasks_manager.auth_server.security.JwtUtils;
 import dev.ivanov.tasks_manager.core.security.JwtAuthenticationToken;
-import jakarta.annotation.Nonnull;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,6 +36,12 @@ import java.util.ArrayList;
 public class AccountService {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(AccountService.class);
+
+    @Value("${app.jwt.expiration-access}")
+    private Long expirationAccess;
+
+    @Value("${app.jwt.expiration-refresh}")
+    private Long expirationRefresh;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -117,13 +121,15 @@ public class AccountService {
                 .orElseThrow(() -> new AccountNotFoundException("account with id " + id + " not found"));
 
         blacklistTokenRepository.save(Token.builder()
-                .id(changePasswordDto.getRefreshToken())
-                .token(changePasswordDto.getRefreshToken())
+                .id(changePasswordDto.getRefresh())
+                .expiration(expirationRefresh)
+                .token(changePasswordDto.getRefresh())
                 .build());
 
         var accessToken = ((JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication()).getJwt();
         blacklistTokenRepository.save(Token.builder()
                 .id(accessToken)
+                .expiration(expirationAccess)
                 .token(accessToken)
                 .build());
         tokenAddedToBlacklistProducer.send(id, accessToken);
@@ -166,5 +172,6 @@ public class AccountService {
         accountRepository.save(savedAccount);
     }
 
+    
 
 }

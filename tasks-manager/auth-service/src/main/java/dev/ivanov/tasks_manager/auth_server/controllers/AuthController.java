@@ -1,13 +1,12 @@
 package dev.ivanov.tasks_manager.auth_server.controllers;
 
-import dev.ivanov.tasks_manager.auth_server.dto.ChangePasswordDto;
-import dev.ivanov.tasks_manager.auth_server.dto.SignInDto;
-import dev.ivanov.tasks_manager.auth_server.dto.SignUpDto;
+import dev.ivanov.tasks_manager.auth_server.dto.*;
 import dev.ivanov.tasks_manager.auth_server.exceptions.AccountNotFoundException;
 import dev.ivanov.tasks_manager.auth_server.exceptions.AuthorizationException;
 import dev.ivanov.tasks_manager.auth_server.services.AccountService;
 import dev.ivanov.tasks_manager.auth_server.services.AuthService;
 import dev.ivanov.tasks_manager.auth_server.validators.ChangePasswordDtoValidator;
+import dev.ivanov.tasks_manager.auth_server.validators.RefreshDtoValidator;
 import dev.ivanov.tasks_manager.auth_server.validators.SignUpDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -32,6 +31,26 @@ public class AuthController {
 
     @Autowired
     private ChangePasswordDtoValidator changePasswordDtoValidator;
+
+    @Autowired
+    private RefreshDtoValidator refreshDtoValidator;
+
+    @PostMapping("/refresh/{accountId}")
+    public ResponseEntity<?> refresh(@RequestBody RefreshDto refreshDto,
+                                     @PathVariable String accountId) {
+        var errors = new BeanPropertyBindingResult(refreshDto, "refreshDto");
+        refreshDtoValidator.validate(refreshDto, errors);
+        if (errors.hasErrors())
+            return ResponseEntity.badRequest().body(errors.getAllErrors()
+                    .stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
+
+        var access = authService.refresh(accountId);
+        return ResponseEntity.ok(
+                TokenDto.builder()
+                        .access(access)
+                        .build()
+        );
+    }
 
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody SignInDto signInDto) {
