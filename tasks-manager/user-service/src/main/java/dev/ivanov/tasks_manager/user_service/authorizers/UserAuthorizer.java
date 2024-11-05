@@ -1,33 +1,25 @@
-package dev.ivanov.tasks_manager.auth_server.authorizers;
-
+package dev.ivanov.tasks_manager.user_service.authorizers;
 
 import dev.ivanov.tasks_manager.core.authorization.Authorizer;
 import dev.ivanov.tasks_manager.core.security.JwtAuthenticationToken;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
-public class AccountAuthorizer implements Authorizer {
-    public static final Logger LOGGER = LoggerFactory.getLogger(AccountAuthorizer.class);
-
+public class UserAuthorizer implements Authorizer {
     @Override
     public boolean authorize(Authentication authentication,
                              HttpServletRequest request,
                              Map<String, String> variables) {
         if (authentication == null || !authentication.isAuthenticated())
             return false;
-        var accountId = variables.get("accountId");
-        if (accountId == null) {
-            LOGGER.error("missing id param");
+        var userId = variables.get("userId");
+        if (userId == null)
             return false;
-        }
         var jwtAuthentication = (JwtAuthenticationToken) authentication;
-        var id = jwtAuthentication.getId();
-        return accountId.equals(id);
+        return jwtAuthentication.getId().equals(userId);
     }
 }

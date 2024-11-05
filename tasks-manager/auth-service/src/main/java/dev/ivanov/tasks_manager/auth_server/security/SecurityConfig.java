@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/delete-account/**").access(resourceAuthorizationManager())
                         .anyRequest().permitAll()
                 )
+                .anonymous(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

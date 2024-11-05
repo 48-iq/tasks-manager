@@ -40,7 +40,6 @@ public class UserController {
     @PutMapping("/{userId}")
     public ResponseEntity<?> update(@PathVariable String userId,
                                     @RequestBody UserUpdateDto userUpdateDto) {
-
         try {
             var updatedUser = userService.updateUser(userId, userUpdateDto);
             return ResponseEntity.ok(UserDto.from(updatedUser));

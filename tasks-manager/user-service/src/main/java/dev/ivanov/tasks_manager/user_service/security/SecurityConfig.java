@@ -1,7 +1,9 @@
 package dev.ivanov.tasks_manager.user_service.security;
 
+import dev.ivanov.tasks_manager.core.authorization.ResourceAuthorizationManager;
 import dev.ivanov.tasks_manager.core.security.BlackListJwtCheckService;
 import dev.ivanov.tasks_manager.core.security.JwtAuthenticationProvider;
+import dev.ivanov.tasks_manager.user_service.authorizers.UserAuthorizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,18 +25,29 @@ public class SecurityConfig {
     @Autowired
     private AuthenticationManager jwtAuthenticationManager;
 
+    @Autowired
+    private UserAuthorizer userAuthorizer;
+
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests ->
-                        requests.requestMatchers(HttpMethod.PUT, "/api/users/**").authenticated()
-                                .requestMatchers(HttpMethod.DELETE, "/api/users/**").authenticated()
+                        requests.requestMatchers(HttpMethod.PUT, "/api/users/**").access(resourceAuthorizationManager())
+                                .requestMatchers(HttpMethod.DELETE, "/api/users/**").access(resourceAuthorizationManager())
                                 .anyRequest().permitAll())
+                .anonymous(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(jwtAuthenticationManager)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
 
+    @Bean
+    public ResourceAuthorizationManager resourceAuthorizationManager() {
+        var authorizationManager = new ResourceAuthorizationManager();
+        authorizationManager.addAuthorizer(userAuthorizer, "/api/users/{userId}", "POST", "PUT");
+        return authorizationManager;
+    }
 }
