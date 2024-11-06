@@ -10,7 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 
 @Configuration
-public class JwtManagerConfig {
+public class JwtAuthenticationManagerConfig {
     @Value("${app.jwt.issuer}")
     private String issuer;
 

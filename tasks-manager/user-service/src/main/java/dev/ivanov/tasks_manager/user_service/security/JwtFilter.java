@@ -36,7 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             var authorizationHeader = request.getHeader("authorization");
             if (authorizationHeader != null) {
-                if (!authorizationHeader.startsWith("bearer "))
+                if (!authorizationHeader.startsWith("Bearer "))
                     throw new JWTVerificationException("incorrect jwt format");
                 var jwt = authorizationHeader.substring(7);
                 var token = new JwtAuthenticationToken();
@@ -47,7 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (JWTVerificationException | UsernameNotFoundException | BlacklistJwtAuthorizationException e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.getWriter().write("incorrect jwt");
+            response.getWriter().write("incorrect jwt: " + e.getMessage());
         }
     }
 }

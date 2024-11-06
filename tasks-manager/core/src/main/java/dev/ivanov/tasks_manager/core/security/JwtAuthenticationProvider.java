@@ -17,9 +17,9 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JwtAuthenticationProvider implements AuthenticationProvider {
-    private String secret = "";
-    private String issuer = "";
-    private String subject = "";
+    private String secret;
+    private String issuer;
+    private String subject;
     private BlackListJwtCheckService blackListJwtCheckService;
 
     @Override
@@ -48,6 +48,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
                 .withClaimPresence("id")
                 .withClaimPresence("username")
                 .withClaimPresence("roles")
+                .withClaim("type", "access")
                 .build();
         return verifier.verify(jwt)
                 .getClaims();
