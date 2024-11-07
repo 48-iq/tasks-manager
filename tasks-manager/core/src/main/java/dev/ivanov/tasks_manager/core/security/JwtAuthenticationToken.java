@@ -22,6 +22,7 @@ public class JwtAuthenticationToken implements Authentication {
     private String username;
     private List<String> roles;
     private String id;
+    private JwtUserDetails details;
 
 
     @Override
@@ -38,7 +39,7 @@ public class JwtAuthenticationToken implements Authentication {
 
     @Override
     public Object getDetails() {
-        return null;
+        return details;
     }
 
     @Override

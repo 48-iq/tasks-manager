@@ -7,6 +7,8 @@ import dev.ivanov.tasks_manager.core.security.exceptions.BlacklistJwtAuthorizati
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -17,6 +19,8 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JwtAuthenticationProvider implements AuthenticationProvider {
+    public static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationProvider.class);
+
     private String secret;
     private String issuer;
     private String subject;
@@ -33,6 +37,8 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         jwtAuthenticationToken.setUsername(claims.get("username").asString());
         jwtAuthenticationToken.setRoles(claims.get("roles").asList(String.class));
         jwtAuthenticationToken.setAuthenticated(true);
+        jwtAuthenticationToken.setDetails(new JwtUserDetails(claims.get("username").asString(),
+                claims.get("authorities").asList(String.class), claims.get("roles").asList(String.class)));
         return jwtAuthenticationToken;
     }
 
@@ -48,6 +54,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
                 .withClaimPresence("id")
                 .withClaimPresence("username")
                 .withClaimPresence("roles")
+                .withClaimPresence("authorities")
                 .withClaim("type", "access")
                 .build();
         return verifier.verify(jwt)
