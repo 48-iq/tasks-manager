@@ -39,7 +39,6 @@ public class SecurityConfig {
                                 .anyRequest().permitAll())
                 .anonymous(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .authenticationManager(jwtAuthenticationManager)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
@@ -47,7 +46,7 @@ public class SecurityConfig {
     @Bean
     public ResourceAuthorizationManager resourceAuthorizationManager() {
         var authorizationManager = new ResourceAuthorizationManager();
-        authorizationManager.addAuthorizer(userAuthorizer, "/api/users/{userId}", "POST", "PUT");
+        authorizationManager.addAuthorizer(userAuthorizer, "/api/users/{userId}", "PUT");
         return authorizationManager;
     }
 }

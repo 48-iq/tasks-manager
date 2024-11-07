@@ -9,6 +9,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -20,6 +22,7 @@ import java.io.IOException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+    public static final Logger LOGGER = LoggerFactory.getLogger(JwtFilter.class);
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -28,6 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     @Nonnull HttpServletResponse response,
                                     @Nonnull FilterChain filterChain) throws ServletException, IOException {
+        LOGGER.info("in filter");
 
         try {
             var authorizationHeader = request.getHeader("authorization");
@@ -52,6 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (AuthorizationException | JWTVerificationException | AuthenticationException | BlacklistJwtAuthorizationException e) {
+            LOGGER.error(e.getMessage());
             response.getWriter().write("authentication error");
             response.setStatus(HttpStatus.BAD_REQUEST.value());
         }

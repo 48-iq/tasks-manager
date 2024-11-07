@@ -67,6 +67,7 @@ public class UserService {
         user.setName(userUpdateDto.getName());
         user.setSurname(userUpdateDto.getSurname());
         user.setEmail(userUpdateDto.getEmail());
+        user.setNickname(userUpdateDto.getNickname());
         return userRepository.save(user);
     }
 
