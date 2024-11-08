@@ -9,8 +9,8 @@ insert into authorities(name) values
     ('CREATE_TOPIC'),
     ('DELETE_GROUP') on conflict do nothing
 
-create table roles();
-alter table if exists roles
+create table group_roles();
+alter table if exists group_roles
     add column if not exists name text primary key not null
 
 insert into roles(name) values
@@ -18,12 +18,12 @@ insert into roles(name) values
     ('ROLE_GROUP_MODER'),
     ('ROLE_GROUP_USER') on conflict do nothing
 
-create table if not exists roles_authorities();
+create table if not exists group_roles_authorities();
 alter table if exists roles_authorities
-    add column if not exists role_name not null,
-    add column if not exists authority_name not null,
+    add column if not exists group_role_name not null references group_roles(name),
+    add column if not exists authority_name not null references authorities(name),
     drop constraint if exists roles_authorities_pkey,
-    add primary key (role_name, authority_name)
+    add primary key (group_role_name, authority_name)
 
 insert into roles_authorities(role_name, authority_name) values
     ('ROLE_GROUP_USER', 'CREATE_TOPIC'),
@@ -46,31 +46,35 @@ alter table if exists users
 create table if not exists groups();
 alter table if exists groups
     add column if not exists id text primary key not null,
-    add column if not exists name text,
+    add column if not exists title text,
     add column if not exists description,
     add column if not exists created_at timestamp not null;
 
 
 create table if not exists users_groups();
 alter table if exists users_groups
+    add column if not exists id text not null primary key,
     add column if not exists user_id text not null references users(id),
     add column if not exists group_id text not null references groups(id),
-    add column if not exists group_role not null references roles(name),
+    add column if not exists group_role_name not null references roles(name),
     drop constraint if exists users_groups_pkey,
-    add primary key(user_id, group_id);
+
 
 create table if not exists topics();
 alter table if exists topics
     add column if not exists id text primary key not null,
     add column if not exists name text not null,
     add column if not exists description not null,
+    add column if not exists complexity not null,
+    add column if not exists importance not null,
+    add column if not exists theme not null,
     add column if not exists created_at timestamp not null,
     add column if not exists creator_id text not null references users(id);
 
 create table if not exists topics_groups();
 alter table if exists topics_groups
-    add column if not exists topic_id text not null,
-    add column if not exists group_id text not null,
+    add column if not exists topic_id text not null references topics(id),
+    add column if not exists group_id text not null references groups(id),
     drop constraint if exists topics_groups_pkey,
     add primary key(topic_id, group_id);
 

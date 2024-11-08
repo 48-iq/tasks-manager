@@ -1,26 +1,21 @@
-package dev.ivanov.tasks_manager.group_service.entities.postgres;
+package dev.ivanov.tasks_manager.group_service.dto;
 
-import jakarta.persistence.*;
-import lombok.*;
+import dev.ivanov.tasks_manager.group_service.entities.postgres.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "topics")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
-@Setter
-public class Topic {
-    @Id
-    private String id;
+public class TopicCreateDto {
     private String title;
     private String description;
     private LocalDateTime createdAt;
-
-    @ManyToOne
-    @JoinColumn(name = "creator_id", referencedColumnName = "id")
     private User creator;
     private Integer complexity;
     private Integer importance;

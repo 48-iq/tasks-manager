@@ -1,18 +1,18 @@
 package dev.ivanov.tasks_manager.group_service.entities.postgres;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "authorities")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Getter
 @Setter
-public class Role {
-    @Id
+public class Authority {
     private String name;
 }
