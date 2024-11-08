@@ -1,11 +1,10 @@
 package dev.ivanov.tasks_manager.group_service.entities.postgres;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "groups")
@@ -20,4 +19,7 @@ public class Group {
     private String title;
     private String description;
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    private List<UserGroupRelation> userGroupRelations;
 }

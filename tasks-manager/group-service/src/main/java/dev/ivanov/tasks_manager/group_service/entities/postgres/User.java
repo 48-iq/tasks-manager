@@ -1,9 +1,9 @@
 package dev.ivanov.tasks_manager.group_service.entities.postgres;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -15,4 +15,7 @@ import lombok.*;
 public class User {
     @Id
     private String id;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserGroupRelation> userGroupRelations;
 }

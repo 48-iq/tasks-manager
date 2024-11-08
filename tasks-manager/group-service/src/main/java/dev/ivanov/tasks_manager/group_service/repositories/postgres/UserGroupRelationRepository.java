@@ -11,4 +11,7 @@ import java.util.List;
 public interface UserGroupRelationRepository extends JpaRepository<UserGroupRelation, String> {
     @Query("select ugr from UserGroupRelation ugr join ugr.group g where g.id = :groupId")
     List<UserGroupRelation> findRelationsByGroup(String groupId);
+
+    @Query("select ugr from UserGroupRelation ugr join ugr.user u where u.id = :userId")
+    List<UserGroupRelation> findRelationsByUser(String userId);
 }

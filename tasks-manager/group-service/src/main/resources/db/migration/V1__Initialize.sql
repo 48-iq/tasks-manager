@@ -20,8 +20,8 @@ insert into roles(name) values
 
 create table if not exists group_roles_authorities();
 alter table if exists roles_authorities
-    add column if not exists group_role_name not null references group_roles(name),
-    add column if not exists authority_name not null references authorities(name),
+    add column if not exists group_role_name text not null references group_roles(name),
+    add column if not exists authority_name text not null references authorities(name),
     drop constraint if exists roles_authorities_pkey,
     add primary key (group_role_name, authority_name)
 
@@ -47,7 +47,7 @@ create table if not exists groups();
 alter table if exists groups
     add column if not exists id text primary key not null,
     add column if not exists title text,
-    add column if not exists description,
+    add column if not exists description text,
     add column if not exists created_at timestamp not null;
 
 
@@ -64,10 +64,10 @@ create table if not exists topics();
 alter table if exists topics
     add column if not exists id text primary key not null,
     add column if not exists name text not null,
-    add column if not exists description not null,
-    add column if not exists complexity not null,
-    add column if not exists importance not null,
-    add column if not exists theme not null,
+    add column if not exists description integer not null,
+    add column if not exists complexity integer not null,
+    add column if not exists importance integer not null,
+    add column if not exists theme text not null,
     add column if not exists created_at timestamp not null,
     add column if not exists creator_id text not null references users(id);
 

@@ -54,7 +54,9 @@ public class UserGroupRelationService {
 
     @Transactional
     public List<String> getGroupsByUser(String userId) {
-
+        var userGroupRelations = userGroupRelationRepository.findRelationsByUser(userId);
+        var groupIds = userGroupRelations.stream().map(ugr -> ugr.getGroup().getId()).toList();
+        return groupIds;
     }
 
     @Transactional
