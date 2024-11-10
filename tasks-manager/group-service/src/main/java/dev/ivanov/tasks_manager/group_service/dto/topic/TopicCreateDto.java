@@ -1,4 +1,4 @@
-package dev.ivanov.tasks_manager.group_service.dto;
+package dev.ivanov.tasks_manager.group_service.dto.topic;
 
 import dev.ivanov.tasks_manager.group_service.entities.postgres.User;
 import lombok.AllArgsConstructor;

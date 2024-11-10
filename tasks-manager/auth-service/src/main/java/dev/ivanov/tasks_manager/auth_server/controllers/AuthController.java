@@ -3,6 +3,7 @@ package dev.ivanov.tasks_manager.auth_server.controllers;
 import dev.ivanov.tasks_manager.auth_server.dto.*;
 import dev.ivanov.tasks_manager.auth_server.exceptions.AccountNotFoundException;
 import dev.ivanov.tasks_manager.auth_server.exceptions.AuthorizationException;
+import dev.ivanov.tasks_manager.auth_server.security.JwtUtils;
 import dev.ivanov.tasks_manager.auth_server.services.AccountService;
 import dev.ivanov.tasks_manager.auth_server.services.AuthService;
 import dev.ivanov.tasks_manager.auth_server.validators.ChangePasswordDtoValidator;
@@ -35,16 +36,19 @@ public class AuthController {
     @Autowired
     private RefreshDtoValidator refreshDtoValidator;
 
-    @PostMapping("/refresh/{accountId}")
-    public ResponseEntity<?> refresh(@RequestBody RefreshDto refreshDto,
-                                     @PathVariable String accountId) {
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody RefreshDto refreshDto) {
         var errors = new BeanPropertyBindingResult(refreshDto, "refreshDto");
         refreshDtoValidator.validate(refreshDto, errors);
         if (errors.hasErrors())
             return ResponseEntity.badRequest().body(errors.getAllErrors()
                     .stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
 
-        var access = authService.refresh(accountId);
+
+        var access = authService.refresh(jwtUtils.verifyRefresh(refreshDto.getRefresh()).get("id").asString());
         return ResponseEntity.ok(
                 TokenDto.builder()
                         .access(access)

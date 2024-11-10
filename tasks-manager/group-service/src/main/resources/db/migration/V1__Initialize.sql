@@ -20,8 +20,8 @@ insert into roles(name) values
 
 create table if not exists group_roles_authorities();
 alter table if exists roles_authorities
-    add column if not exists group_role_name text not null references group_roles(name),
-    add column if not exists authority_name text not null references authorities(name),
+    add column if not exists group_role_name text not null references group_roles(name) on delete cascade,
+    add column if not exists authority_name text not null references authorities(name) on delete cascade,
     drop constraint if exists roles_authorities_pkey,
     add primary key (group_role_name, authority_name)
 
@@ -54,9 +54,9 @@ alter table if exists groups
 create table if not exists users_groups();
 alter table if exists users_groups
     add column if not exists id text not null primary key,
-    add column if not exists user_id text not null references users(id),
-    add column if not exists group_id text not null references groups(id),
-    add column if not exists group_role_name not null references roles(name),
+    add column if not exists user_id text not null references users(id) on delete cascade,
+    add column if not exists group_id text not null references groups(id) on delete cascade,
+    add column if not exists group_role_name not null references roles(name) on delete cascade,
     drop constraint if exists users_groups_pkey,
 
 
@@ -70,15 +70,14 @@ alter table if exists topics
     add column if not exists theme text not null,
     add column if not exists created_at timestamp not null,
     add column if not exists creator_id text not null references users(id);
+    add column if not exists group_id text not null references groups(id) on delete cascade;
 
-create table if not exists topics_groups();
-alter table if exists topics_groups
-    add column if not exists topic_id text not null references topics(id),
-    add column if not exists group_id text not null references groups(id),
-    drop constraint if exists topics_groups_pkey,
-    add primary key(topic_id, group_id);
-
-
+create table if not exists invitations();
+alter table if exists invitations
+    add column if not exists id text not null primary key,
+    add column if not exists group_id text not null references groups(id) on delete cascade,
+    add column if not exists user_id text not null references users(id) on delete cascade;
+    add column if not exists result boolean;
 
 
 

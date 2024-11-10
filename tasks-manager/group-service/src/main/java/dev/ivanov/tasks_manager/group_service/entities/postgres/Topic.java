@@ -25,4 +25,8 @@ public class Topic {
     private Integer complexity;
     private Integer importance;
     private String theme;
+
+    @ManyToOne
+    @JoinColumn(name = "group_id", referencedColumnName = "id")
+    private Group group;
 }

@@ -1,33 +1,38 @@
 package dev.ivanov.tasks_manager.auth_server.authorizers;
 
 
-import dev.ivanov.tasks_manager.core.authorization.Authorizer;
 import dev.ivanov.tasks_manager.core.security.JwtAuthenticationToken;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import java.util.function.Supplier;
 
 @Component
-public class AccountAuthorizer implements Authorizer {
+public class AccountAuthorizer implements AuthorizationManager<RequestAuthorizationContext> {
     public static final Logger LOGGER = LoggerFactory.getLogger(AccountAuthorizer.class);
 
     @Override
-    public boolean authorize(Authentication authentication,
-                             HttpServletRequest request,
-                             Map<String, String> variables) {
+    public AuthorizationDecision check(Supplier<Authentication> authenticationSupplier,
+                                       RequestAuthorizationContext requestAuthorizationContext) {
+
+        var authentication = authenticationSupplier.get();
+        var request = requestAuthorizationContext.getRequest();
+        var variables = requestAuthorizationContext.getVariables();
+
         if (authentication == null || !authentication.isAuthenticated())
-            return false;
+            return new AuthorizationDecision(false);
         var accountId = variables.get("accountId");
         if (accountId == null) {
             LOGGER.error("missing id param");
-            return false;
+            return new AuthorizationDecision(false);
         }
         var jwtAuthentication = (JwtAuthenticationToken) authentication;
         var id = jwtAuthentication.getId();
-        return accountId.equals(id);
+        return new AuthorizationDecision(accountId.equals(id));
     }
 }

@@ -1,4 +1,4 @@
-package dev.ivanov.tasks_manager.group_service.dto;
+package dev.ivanov.tasks_manager.group_service.dto.topic;
 
 import dev.ivanov.tasks_manager.core.utils.Formatters;
 import dev.ivanov.tasks_manager.group_service.entities.postgres.Topic;
@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -22,6 +20,7 @@ public class TopicDto {
     private Integer complexity;
     private Integer importance;
     private String theme;
+    private String groupId;
 
     public static TopicDto from(Topic topic) {
         return TopicDto.builder()
@@ -33,6 +32,7 @@ public class TopicDto {
                 .complexity(topic.getComplexity())
                 .importance(topic.getImportance())
                 .theme(topic.getTheme())
+                .groupId(topic.getGroup().getId())
                 .build();
     }
 }

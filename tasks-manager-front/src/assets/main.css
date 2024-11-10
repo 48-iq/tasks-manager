@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Rubik', sans-serif;
+}
+/* палитра цветов*/
+/* .color1 {color: #060606;}
+.color2 {color: #29293f;}
+.color3 {color: #5d5f88;}
+.color4 {color: #989edf;}
+.color5 {color: #cfd2ea;} */

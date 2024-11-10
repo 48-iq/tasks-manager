@@ -1,6 +1,5 @@
 package dev.ivanov.tasks_manager.group_service.services;
 
-import dev.ivanov.tasks_manager.group_service.dto.GroupDto;
 import dev.ivanov.tasks_manager.group_service.entities.postgres.UserGroupRelation;
 import dev.ivanov.tasks_manager.group_service.repositories.postgres.GroupRepository;
 import dev.ivanov.tasks_manager.group_service.repositories.postgres.GroupRoleRepository;

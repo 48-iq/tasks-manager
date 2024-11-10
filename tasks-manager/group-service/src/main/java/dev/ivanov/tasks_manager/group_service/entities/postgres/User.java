@@ -16,6 +16,4 @@ public class User {
     @Id
     private String id;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserGroupRelation> userGroupRelations;
 }

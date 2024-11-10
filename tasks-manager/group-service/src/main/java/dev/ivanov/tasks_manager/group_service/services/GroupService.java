@@ -1,9 +1,8 @@
 package dev.ivanov.tasks_manager.group_service.services;
 
-import dev.ivanov.tasks_manager.group_service.dto.GroupCreateDto;
-import dev.ivanov.tasks_manager.group_service.dto.GroupDto;
-import dev.ivanov.tasks_manager.group_service.dto.GroupUpdateDto;
-import dev.ivanov.tasks_manager.group_service.dto.TopicDto;
+import dev.ivanov.tasks_manager.group_service.dto.group.GroupCreateDto;
+import dev.ivanov.tasks_manager.group_service.dto.group.GroupDto;
+import dev.ivanov.tasks_manager.group_service.dto.group.GroupUpdateDto;
 import dev.ivanov.tasks_manager.group_service.entities.postgres.Group;
 import dev.ivanov.tasks_manager.group_service.entities.postgres.GroupRole;
 import dev.ivanov.tasks_manager.group_service.exceptions.GroupNotFoundException;
@@ -75,8 +74,11 @@ public class GroupService {
         groupRepository.deleteById(groupId);
     }
 
+    @Transactional
     public List<GroupDto> getGroupsByUser(String userId) {
         var groups = groupRepository.findGroupsByUser(userId);
-
+        return groups.stream().map(GroupDto::from).toList();
     }
+
+
 }

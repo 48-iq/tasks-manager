@@ -1,17 +1,15 @@
-package dev.ivanov.tasks_manager.group_service.dto;
+package dev.ivanov.tasks_manager.group_service.dto.group;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GroupCreateDto {
+public class GroupUpdateDto {
     private String title;
     private String description;
 }

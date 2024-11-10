@@ -26,12 +26,7 @@ public class RefreshDtoValidator implements Validator {
         var refreshDto = (RefreshDto) target;
         var refresh = refreshDto.getRefresh();
         try {
-            var claims = jwtUtils.verifyRefresh(refresh);
-            var id = claims.get("id").asString();
-            var authentication = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-            var accountId = authentication.getId();
-            if (!accountId.equals(id))
-                errors.reject("refresh", "incorrect account id in refresh");
+            jwtUtils.verifyRefresh(refresh);
         } catch (JWTVerificationException e) {
             errors.reject("refresh", "incorrect refresh");
         }

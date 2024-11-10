@@ -1,6 +1,6 @@
 package dev.ivanov.tasks_manager.group_service.controllers;
 
-import dev.ivanov.tasks_manager.group_service.dto.GroupCreateDto;
+import dev.ivanov.tasks_manager.group_service.dto.group.GroupCreateDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

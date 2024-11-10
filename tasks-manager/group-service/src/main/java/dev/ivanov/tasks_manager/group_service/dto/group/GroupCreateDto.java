@@ -1,4 +1,4 @@
-package dev.ivanov.tasks_manager.group_service.dto;
+package dev.ivanov.tasks_manager.group_service.dto.group;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GroupUpdateDto {
+public class GroupCreateDto {
     private String title;
     private String description;
 }

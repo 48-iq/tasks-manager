@@ -20,6 +20,4 @@ public class Group {
     private String description;
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
-    private List<UserGroupRelation> userGroupRelations;
 }

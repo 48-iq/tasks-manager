@@ -1,4 +1,4 @@
-package dev.ivanov.tasks_manager.group_service.dto;
+package dev.ivanov.tasks_manager.group_service.dto.group;
 
 import dev.ivanov.tasks_manager.core.utils.Formatters;
 import dev.ivanov.tasks_manager.group_service.entities.postgres.Group;
@@ -6,9 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Data
 @NoArgsConstructor

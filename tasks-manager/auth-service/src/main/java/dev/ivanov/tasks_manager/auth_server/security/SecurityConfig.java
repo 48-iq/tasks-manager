@@ -1,17 +1,12 @@
 package dev.ivanov.tasks_manager.auth_server.security;
 
 import dev.ivanov.tasks_manager.auth_server.authorizers.AccountAuthorizer;
-import dev.ivanov.tasks_manager.core.authorization.ResourceAuthorizationManager;
-import dev.ivanov.tasks_manager.core.security.JwtAuthenticationProvider;
-import dev.ivanov.tasks_manager.core.security.BlackListJwtCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -38,8 +33,8 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/auth/change-password").access(resourceAuthorizationManager())
-                        .requestMatchers("/api/auth/delete-account/**").access(resourceAuthorizationManager())
+                        .requestMatchers("/api/auth/change-password").access(accountAuthorizer)
+                        .requestMatchers("/api/auth/delete-account/**").access(accountAuthorizer)
                         .anyRequest().permitAll()
                 )
                 .anonymous(AbstractHttpConfigurer::disable)
@@ -61,13 +56,5 @@ public class SecurityConfig {
         return new ProviderManager(provider);
     }
 
-    @Bean
-    public ResourceAuthorizationManager resourceAuthorizationManager() {
-        ResourceAuthorizationManager resourceAuthorizationManager = new ResourceAuthorizationManager();
-        resourceAuthorizationManager.addAuthorizer(accountAuthorizer, "/delete-account/{accountId}", "DELETE");
-        resourceAuthorizationManager.addAuthorizer(accountAuthorizer, "/change-password/{accountId}", "PUT");
-        resourceAuthorizationManager.addAuthorizer(accountAuthorizer, "/refresh/{accountId}", "POST");
-        return resourceAuthorizationManager;
-    }
 
 }
