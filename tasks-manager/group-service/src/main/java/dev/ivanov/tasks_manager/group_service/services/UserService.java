@@ -11,13 +11,10 @@ public class UserService {
     private UserRepository userRepository;
 
     public void createUser(String id) {
-        if (!userRepository.existsById(id)) {
-            var user = new User(id);
-            userRepository.save(user);
-        }
+        userRepository.save(new User(id));
     }
 
     public void deleteUser(String id) {
-
+        userRepository.deleteById(id);
     }
 }

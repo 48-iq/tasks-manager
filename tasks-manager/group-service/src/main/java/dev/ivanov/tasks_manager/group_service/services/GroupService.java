@@ -54,6 +54,7 @@ public class GroupService {
         userGroupRelationService.saveUserGroupRelation(userId, groupId, GroupRole.ROLE_GROUP_ADMIN);
 
         var groupDto = GroupDto.from(savedGroup);
+
         return groupDto;
     }
 

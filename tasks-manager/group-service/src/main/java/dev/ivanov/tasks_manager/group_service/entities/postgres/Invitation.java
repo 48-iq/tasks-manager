@@ -23,5 +23,5 @@ public class Invitation {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    private Boolean result;
+    private Boolean rejected;
 }

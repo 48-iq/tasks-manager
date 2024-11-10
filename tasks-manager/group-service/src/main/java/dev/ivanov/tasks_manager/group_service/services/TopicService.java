@@ -5,6 +5,7 @@ import dev.ivanov.tasks_manager.group_service.dto.topic.TopicDto;
 import dev.ivanov.tasks_manager.group_service.dto.topic.TopicUpdateDto;
 import dev.ivanov.tasks_manager.group_service.entities.postgres.Topic;
 import dev.ivanov.tasks_manager.group_service.exceptions.InternalServerException;
+import dev.ivanov.tasks_manager.group_service.exceptions.TopicNotFoundException;
 import dev.ivanov.tasks_manager.group_service.repositories.postgres.GroupRepository;
 import dev.ivanov.tasks_manager.group_service.repositories.postgres.TopicRepository;
 import dev.ivanov.tasks_manager.group_service.repositories.postgres.UserRepository;
@@ -66,6 +67,20 @@ public class TopicService {
 
     @Transactional
     public TopicDto updateTopic(String topicId, TopicUpdateDto topicUpdateDto) {
-
+        var topic = topicRepository.findById(topicId)
+                .orElseThrow(() -> new TopicNotFoundException("topic with id " + topicId + " not found"));
+        topic.setTitle(topicUpdateDto.getTitle());
+        topic.setDescription(topicUpdateDto.getDescription());
+        topic.setComplexity(topicUpdateDto.getComplexity());
+        topic.setImportance(topicUpdateDto.getImportance());
+        topic.setTheme(topicUpdateDto.getTheme());
+        var savedTopic = topicRepository.save(topic);
+        return TopicDto.from(savedTopic);
     }
+
+    @Transactional
+    public void deleteTopic(String topicId) {
+        topicRepository.deleteById(topicId);
+    }
+
 }

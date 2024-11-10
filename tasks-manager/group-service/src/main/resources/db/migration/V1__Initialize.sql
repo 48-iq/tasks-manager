@@ -5,8 +5,7 @@ alter table if exists authorities
 insert into authorities(name) values
     ('ADD_USERS'),
     ('DELETE_USERS'),
-    ('CHANGE_ROLE'),
-    ('CREATE_TOPIC'),
+    ('UPDATE_GROUP'),
     ('DELETE_GROUP') on conflict do nothing
 
 create table group_roles();
@@ -28,14 +27,12 @@ alter table if exists roles_authorities
 insert into roles_authorities(role_name, authority_name) values
     ('ROLE_GROUP_USER', 'CREATE_TOPIC'),
 
-    ('ROLE_GROUP_MODER', 'CREATE_TOPIC'),
     ('ROLE_GROUP_MODER', 'ADD_USERS'),
     ('ROLE_GROUP_MODER', 'DELETE_USERS),
 
-    ('ROLE_GROUP_ADMIN', 'CREATE_TOPIC'),
     ('ROLE_GROUP_ADMIN', 'ADD_USERS'),
     ('ROLE_GROUP_ADMIN', 'DELETE_USERS'),
-    ('ROLE_GROUP_ADMIN', 'CHANGE_ROLE'),
+    ('ROLE_GROUP_ADMIN', 'UPDATE_GROUP'),
     ('ROLE_GROUP_ADMIN', 'DELETE_GROUP')
 
 
@@ -77,7 +74,7 @@ alter table if exists invitations
     add column if not exists id text not null primary key,
     add column if not exists group_id text not null references groups(id) on delete cascade,
     add column if not exists user_id text not null references users(id) on delete cascade;
-    add column if not exists result boolean;
+    add column if not exists rejected boolean not null;
 
 
 

@@ -1,5 +1,6 @@
 package dev.ivanov.tasks_manager.group_service.services;
 
+import dev.ivanov.tasks_manager.group_service.entities.postgres.GroupRole;
 import dev.ivanov.tasks_manager.group_service.entities.postgres.UserGroupRelation;
 import dev.ivanov.tasks_manager.group_service.repositories.postgres.GroupRepository;
 import dev.ivanov.tasks_manager.group_service.repositories.postgres.GroupRoleRepository;
@@ -42,6 +43,12 @@ public class UserGroupRelationService {
                 userGroupRelationRepository.save(relation);
             }
         }
+    }
+
+    @Transactional
+    public GroupRole getUserGroupRole(String userId, String groupId) {
+        var relationOptional = userGroupRelationRepository.findById(userGroupRelationId(userId, groupId));
+        return relationOptional.map(UserGroupRelation::getGroupRole).orElse(null);
     }
 
     @Transactional
