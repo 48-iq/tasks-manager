@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import RegisterHeader from '@/components/register/RegisterHeader.vue';
+import MessageHeader from '@/components/base/MessageHeader.vue'
+import RegisterForm from '@/components/register/RegisterForm.vue'
 </script>
 
-
-
 <template>
-  <div>
-    <RegisterHeader/>
+  <div class="register-page">
+    <MessageHeader> Станьте частью Tasks Manager</MessageHeader>
+    <div class="register-page-content">
+      <RegisterForm />
+    </div>
   </div>
 </template>
 
@@ -19,9 +21,6 @@ import RegisterHeader from '@/components/register/RegisterHeader.vue';
 }
 
 .register-page-content {
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  margin-top: 30px;
 }
 </style>

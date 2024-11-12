@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import LoginForm from '@/components/login/LoginForm.vue'
-import LoginHeader from '@/components/login/LoginHeader.vue'
+import MessageHeader from '@/components/base/MessageHeader.vue'
 </script>
 
 <template>
   <div class="login-page">
-    <LoginHeader />
+    <MessageHeader> Добро пожаловать в Tasks Manager </MessageHeader>
     <div class="login-page-content">
       <LoginForm />
     </div>

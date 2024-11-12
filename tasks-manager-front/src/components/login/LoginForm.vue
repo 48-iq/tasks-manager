@@ -13,14 +13,11 @@ const signIn = () => {
   authStore.signIn(username.value, password.value)
 }
 
-if (authStore.user)
-  console.log('user', authStore.user)
+if (authStore.user) console.log('user', authStore.user)
 
 authStore.$subscribe((mutation, state) => {
-  if (state.user)
-    console.log('user', state.user)
+  if (state.user) console.log('user', state.user)
 })
-
 
 const toRegister = () => {}
 </script>
@@ -28,8 +25,8 @@ const toRegister = () => {}
 <template>
   <form class="login-form">
     <span>Вход</span>
-    <BaseInput v-model="username" />
-    <BaseInput type="password" v-model="password" />
+    <BaseInput v-model="username" placeholder="Логин" />
+    <BaseInput type="password" v-model="password" placeholder="Пароль" />
     <BaseButton width="100%" @click.prevent="signIn">Войти</BaseButton>
     <BaseButton width="100%" @click.prevent="toRegister">Зарегистрироваться</BaseButton>
   </form>

@@ -1,6 +1,8 @@
+
+
 <template>
   <header class="header">
-    <span>Добро пожаловать в Tasks Manager</span>
+    <span><slot/></span>
   </header>
 </template>
 

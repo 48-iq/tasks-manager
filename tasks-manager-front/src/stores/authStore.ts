@@ -53,7 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
         }
       }).catch(err => {
         isLoading.value = false;
-        error.value = err.response.data.message
+        error.value = err.message
         user.value = null
       })
   }
@@ -91,7 +91,7 @@ export const useAuthStore = defineStore('auth', () => {
           }, exp.getTime() - Date.now() - 1000 * 10)
         }).catch(err => {
           isLoading.value = false;
-          error.value = err.response.data
+          error.value = err.message
           user.value = null
         })
     }
