@@ -22,5 +22,8 @@ import RegisterForm from '@/components/register/RegisterForm.vue'
 
 .register-page-content {
   margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>
