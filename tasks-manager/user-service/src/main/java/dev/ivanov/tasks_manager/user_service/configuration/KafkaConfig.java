@@ -36,4 +36,32 @@ public class KafkaConfig {
                 .partitions(3)
                 .build();
     }
+
+    @Bean
+    public NewTopic userCreationCommitEventsTopic() {
+        return TopicBuilder.name(Topics.USER_CREATION_COMMIT_EVENTS_TOPIC)
+                .partitions(3)
+                .build();
+    }
+
+    @Bean
+    public NewTopic userCreationRollbackEventsTopic() {
+        return TopicBuilder.name(Topics.USER_CREATION_ROLLBACK_EVENTS_TOPIC)
+                .partitions(3)
+                .build();
+    }
+
+    @Bean
+    public NewTopic userDeletionCommitEventsTopic() {
+        return TopicBuilder.name(Topics.USER_DELETION_COMMIT_EVENTS_TOPIC)
+                .partitions(3)
+                .build();
+    }
+
+    @Bean
+    public NewTopic userDeletionRollbackEventsTopic() {
+        return TopicBuilder.name(Topics.USER_DELETION_ROLLBACK_EVENTS_TOPIC)
+                .partitions(3)
+                .build();
+    }
 }

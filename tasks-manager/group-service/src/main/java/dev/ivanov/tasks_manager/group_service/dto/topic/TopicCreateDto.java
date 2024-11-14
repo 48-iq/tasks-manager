@@ -16,7 +16,6 @@ public class TopicCreateDto {
     private String title;
     private String description;
     private LocalDateTime createdAt;
-    private User creator;
     private Integer complexity;
     private Integer importance;
     private String theme;
