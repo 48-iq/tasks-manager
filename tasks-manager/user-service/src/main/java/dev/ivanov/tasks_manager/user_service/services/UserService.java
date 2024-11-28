@@ -6,10 +6,12 @@ import dev.ivanov.tasks_manager.core.events.user.UserDeletedEvent;
 import dev.ivanov.tasks_manager.user_service.dto.UserUpdateDto;
 import dev.ivanov.tasks_manager.user_service.entities.postgres.User;
 import dev.ivanov.tasks_manager.core.events.user.UserCreatedEvent;
+import dev.ivanov.tasks_manager.user_service.entities.redis.UserCache;
 import dev.ivanov.tasks_manager.user_service.exceptions.InternalServerException;
 import dev.ivanov.tasks_manager.user_service.producers.UserCreatedProducer;
 import dev.ivanov.tasks_manager.user_service.producers.UserDeletedProducer;
 import dev.ivanov.tasks_manager.user_service.repositories.postgres.UserRepository;
+import dev.ivanov.tasks_manager.user_service.repositories.redis.UserCacheRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,21 +37,17 @@ public class UserService {
     @Autowired
     private UserDeletedProducer userDeletedProducer;
 
+    @Autowired
+    private UserCacheRepository userCacheRepository;
+
+
     @Transactional
-    public User createUser(String id) {
-        var user = User.builder()
-                .id(id)
-                .name("")
-                .surname("")
-                .nickname("")
-                .build();
-        return userRepository.save(user);
-
-    }
-
     public void createUser(UserCreateEvent userCreateEvent) {
         try {
-            var user = createUser(userCreateEvent.getId());
+            var user = UserCache.builder()
+                    .id(userCreateEvent.getId())
+                    .build();
+            userCacheRepository.save(user);
             userCreatedProducer.sendSuccessful(userCreateEvent.getId(),
                     userCreateEvent.getTransactionId());
         } catch (Exception e) {
@@ -58,6 +56,27 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public void commitUserCreation(String userId) {
+        try {
+
+        }
+    }
+
+    @Transactional
+    public void rollbackUserCreation(String userId) {
+
+    }
+
+    @Transactional
+    public void commitUserDeletion(String userId) {
+
+    }
+
+    @Transactional
+    public void rollbackUserDeletion(String userId) {
+
+    }
 
 
     @Transactional
@@ -72,13 +91,8 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(String userId) {
-        userRepository.deleteById(userId);
-    }
-
     public void deleteUser(UserDeleteEvent userDeletedEvent) {
         try {
-            deleteUser(userDeletedEvent.getId());
             userDeletedProducer.sendSuccessful(userDeletedEvent.getId(), userDeletedEvent.getTransactionId());
         } catch (Exception e) {
             userDeletedProducer.sendError(userDeletedEvent.getId(), userDeletedEvent.getTransactionId());
